@@ -2,7 +2,8 @@
   "name": "stuffit",
   "version": "0.1.0",
   "description": "Observable state stores.",
-  "main": "lib/index.js",
+  "main": "lib/es6/index.js",
+  "module": "lib/es6/index.js",
   "scripts": {
     "lint": "tslint \"src/**/*.ts\" \"test/**/*.ts\"",
     "build": "rimraf lib/ && tsc && copy-cli \"src/**/*.d.ts\" \"lib/es6/\"",
@@ -26,5 +27,8 @@
     "rimraf": "^2.6.3",
     "tslint": "^5.18.0",
     "typescript": "^3.5.3"
+  },
+  "dependencies": {
+    "promise-result": "^1.0.0"
   }
 }

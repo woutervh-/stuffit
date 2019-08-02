@@ -1,8 +1,10 @@
 export { Store } from './store';
 export { Subscription } from './subscription';
 
-import * as Stores from './stores/index';
+import * as Operatos from './operators';
+import * as Producers from './producers';
 
 export {
-    Stores
+    Operatos,
+    Producers
 };

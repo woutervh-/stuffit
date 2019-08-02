@@ -1,6 +1,6 @@
 import { Store } from '../store';
 
-export class Interval extends Store<number> {
+export class IntervalStore extends Store<number> {
     private timer: number | undefined = undefined;
     private timeout: number;
 
