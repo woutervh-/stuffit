@@ -1,0 +1,19 @@
+{
+    "compilerOptions": {
+        "module": "es6",
+        "target": "es6",
+        "outDir": "lib/es6",
+        "lib": [
+            "es2016",
+            "dom"
+        ],
+        "strict": true,
+        "sourceMap": true,
+        "allowSyntheticDefaultImports": false,
+        "noUnusedLocals": true,
+        "declaration": true
+    },
+    "include": [
+        "src"
+    ]
+}
