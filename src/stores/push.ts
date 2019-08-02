@@ -1,6 +1,6 @@
 import { Store } from '../store';
 
-export class PushStore<T> extends Store<T> {
+export class Push<T> extends Store<T> {
     private innerState: T;
 
     public constructor(initialState: T) {
