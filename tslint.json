@@ -76,7 +76,7 @@
             false
         ],
         "member-access": [
-            false
+            true
         ],
         "member-ordering": [
             true,
