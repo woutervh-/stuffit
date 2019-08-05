@@ -4,6 +4,7 @@
   "description": "Observable state stores.",
   "main": "lib/es6/index.js",
   "module": "lib/es6/index.js",
+  "types": "lib/es6/index.d.ts",
   "scripts": {
     "lint": "tslint \"src/**/*.ts\" \"test/**/*.ts\"",
     "build": "rimraf lib/ && tsc && copy-cli \"src/**/*.d.ts\" \"lib/es6/\"",
