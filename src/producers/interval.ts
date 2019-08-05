@@ -3,6 +3,7 @@ import { Store } from '../store';
 export class IntervalStore extends Store<number> {
     private timer: number | undefined = undefined;
     private timeout: number;
+    private counter = 0;
 
     constructor(timeout: number) {
         super();
@@ -10,7 +11,7 @@ export class IntervalStore extends Store<number> {
     }
 
     public get state() {
-        return 0;
+        return this.counter;
     }
 
     protected start() {
@@ -27,6 +28,7 @@ export class IntervalStore extends Store<number> {
     }
 
     private handleInterval = () => {
+        this.counter += 1;
         this.notify(this.state);
     }
 }
