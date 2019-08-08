@@ -9,12 +9,12 @@ export abstract class Store<T> {
     public subscribe(listener: (value: T) => void): Subscription {
         const token = this.listenerCounter++;
         this.listeners.set(token, listener);
-        if (Object.keys(this.listeners).length === 1) {
+        if (this.listeners.size === 1) {
             this.start();
         }
         return {
             unsubscribe: () => {
-                if (Object.keys(this.listeners).length === 1) {
+                if (this.listeners.size === 1) {
                     this.stop();
                 }
                 this.listeners.delete(token);
