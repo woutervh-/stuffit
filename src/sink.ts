@@ -12,7 +12,7 @@ export abstract class Sink<T> {
     public start() {
         if (!this.subscription) {
             this.handleNext(this.source.state);
-            this.subscription = this.source.subscribe(this.handleNext);
+            this.subscription = this.source.subscribe((value) => this.handleNext(value));
         }
     }
 
