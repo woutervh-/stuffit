@@ -37,3 +37,7 @@ export class PromiseStore<T> extends Store<PromiseResult<T>> {
         this.notify(rejected);
     }
 }
+
+export const promise = <T>(promise: Promise<T>): PromiseStore<T> => {
+    return new PromiseStore(promise);
+};

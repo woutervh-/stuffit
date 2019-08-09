@@ -32,3 +32,7 @@ export class IntervalStore extends Store<number> {
         this.notify(this.state);
     }
 }
+
+export const interval = (timeout: number): IntervalStore => {
+    return new IntervalStore(timeout);
+};
