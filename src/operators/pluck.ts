@@ -7,13 +7,9 @@ export class PluckStore<T, K extends keyof T> extends Store<T[K]> {
     private subscription: Subscription | undefined = undefined;
 
     constructor(source: Store<T>, key: K) {
-        super();
+        super(source.state[key]);
         this.source = source;
         this.key = key;
-    }
-
-    public get state() {
-        return this.source.state[this.key];
     }
 
     protected start() {
@@ -30,7 +26,7 @@ export class PluckStore<T, K extends keyof T> extends Store<T[K]> {
     }
 
     private handleNext = () => {
-        this.notify(this.state);
+        this.setInnerState(this.source.state[this.key]);
     }
 }
 

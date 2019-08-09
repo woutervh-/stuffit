@@ -2,17 +2,12 @@ import { Store } from '../store';
 import { Subscription } from '../subscription';
 
 export class CombineStore<T extends unknown[]> extends Store<T> {
-    private sources: Store<unknown>[];
-
+    private sources: { [K in keyof T]: Store<T[K]> };
     private subscriptions: Subscription[] | undefined = undefined;
 
     constructor(sources: { [K in keyof T]: Store<T[K]> }) {
-        super();
+        super(CombineStore.combine<T>(sources));
         this.sources = sources;
-    }
-
-    public get state() {
-        return this.sources.map((source) => source.state) as T;
     }
 
     protected start() {
@@ -35,7 +30,11 @@ export class CombineStore<T extends unknown[]> extends Store<T> {
     }
 
     private handleNext = () => {
-        this.notify(this.state);
+        this.setInnerState(CombineStore.combine<T>(this.sources));
+    }
+
+    private static combine<T extends unknown[]>(sources: { [K in keyof T]: Store<T[K]> }) {
+        return sources.map((source) => source.state) as T;
     }
 }
 

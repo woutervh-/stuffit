@@ -4,18 +4,10 @@ import { Subscription } from '../subscription';
 export class HistoryStore<T> extends Store<(T | undefined)[]> {
     private source: Store<T>;
     private subscription: Subscription | undefined = undefined;
-    private history: (T | undefined)[] = [];
 
     constructor(source: Store<T>, frames: number) {
-        super();
+        super(HistoryStore.emptyHistory(frames));
         this.source = source;
-        for (let i = 0; i < frames; i++) {
-            this.history.push(undefined);
-        }
-    }
-
-    public get state() {
-        return this.history;
     }
 
     protected start() {
@@ -32,11 +24,18 @@ export class HistoryStore<T> extends Store<(T | undefined)[]> {
     }
 
     private handleNext = (value: T) => {
-        const history = this.history.slice();
+        const history = this.state.slice();
         history.shift();
         history.push(value);
-        this.history = history;
-        this.notify(history);
+        this.setInnerState(history);
+    }
+
+    private static emptyHistory(frames: number) {
+        const history: undefined[] = [];
+        for (let i = 0; i < frames; i++) {
+            history.push(undefined);
+        }
+        return history;
     }
 }
 

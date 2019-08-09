@@ -7,13 +7,9 @@ export class MapStore<T, U> extends Store<U> {
     private subscription: Subscription | undefined = undefined;
 
     constructor(source: Store<T>, project: (value: T) => U) {
-        super();
+        super(project(source.state));
         this.source = source;
         this.project = project;
-    }
-
-    public get state() {
-        return this.project(this.source.state);
     }
 
     protected start() {
@@ -30,7 +26,7 @@ export class MapStore<T, U> extends Store<U> {
     }
 
     private handleNext = () => {
-        this.notify(this.state);
+        this.setInnerState(this.project(this.source.state));
     }
 }
 

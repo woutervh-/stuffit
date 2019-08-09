@@ -1,3 +1,4 @@
+export { PushStore } from './push-store';
 export { Sink } from './sink';
 export { Store } from './store';
 export { Subscription } from './subscription';

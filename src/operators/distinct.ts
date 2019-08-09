@@ -5,17 +5,11 @@ export class DistinctStore<T> extends Store<T> {
     private source: Store<T>;
     private testEquality: (previous: T, next: T) => boolean;
     private subscription: Subscription | undefined = undefined;
-    private currentState: T;
 
     constructor(source: Store<T>, testEquality: (previous: T, next: T) => boolean) {
-        super();
+        super(source.state);
         this.source = source;
         this.testEquality = testEquality;
-        this.currentState = source.state;
-    }
-
-    public get state() {
-        return this.currentState;
     }
 
     protected start() {
@@ -32,9 +26,8 @@ export class DistinctStore<T> extends Store<T> {
     }
 
     private handleNext = (value: T) => {
-        if (!this.testEquality(this.currentState, value)) {
-            this.currentState = value;
-            this.notify(value);
+        if (!this.testEquality(this.state, value)) {
+            this.setInnerState(value);
         }
     }
 }

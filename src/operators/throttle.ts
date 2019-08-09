@@ -4,20 +4,14 @@ import { Subscription } from '../subscription';
 export class ThrottleStore<T> extends Store<T> {
     private source: Store<T>;
     private limit: number | 'raf';
-    private innerState: T;
     private subscription: Subscription | undefined = undefined;
     private throttledState: { value: T } | undefined = undefined;
     private throttleTimeout: number | undefined = undefined;
 
     constructor(source: Store<T>, limit: number | 'raf') {
-        super();
+        super(source.state);
         this.source = source;
         this.limit = limit;
-        this.innerState = source.state;
-    }
-
-    public get state() {
-        return this.innerState;
     }
 
     protected start() {
@@ -45,16 +39,14 @@ export class ThrottleStore<T> extends Store<T> {
     private handleThrottledCallback = () => {
         this.throttleTimeout = undefined;
         if (this.throttledState) {
-            this.innerState = this.throttledState.value;
-            this.notify(this.throttledState.value);
+            this.setInnerState(this.throttledState.value);
             this.throttledState = undefined;
         }
     }
 
     private handleNext = (value: T) => {
         if (this.throttleTimeout === undefined) {
-            this.innerState = value;
-            this.notify(value);
+            this.setInnerState(value);
 
             if (typeof this.limit === 'number') {
                 this.throttleTimeout = setTimeout(this.handleThrottledCallback, this.limit);

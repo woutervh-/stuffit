@@ -3,18 +3,12 @@ import { Subscription } from '../subscription';
 
 export class FlattenStore<T> extends Store<T> {
     private source: Store<Store<T>>;
-
     private outerSubscription: Subscription | undefined = undefined;
-
     private innerSubscription: Subscription | undefined = undefined;
 
     constructor(source: Store<Store<T>>) {
-        super();
+        super(source.state.state);
         this.source = source;
-    }
-
-    public get state() {
-        return this.source.state.state;
     }
 
     protected start() {
@@ -43,7 +37,7 @@ export class FlattenStore<T> extends Store<T> {
     }
 
     private handleNextInner = () => {
-        this.notify(this.state);
+        this.setInnerState(this.source.state.state);
     }
 }
 
