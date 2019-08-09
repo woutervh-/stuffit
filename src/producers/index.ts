@@ -1,3 +1,3 @@
-export { interval } from './interval';
-export { promise } from './promise';
-export { push } from './push';
+export { fromInterval } from './interval';
+export { fromPromise } from './promise';
+export { fromValue, PushStore } from './push';

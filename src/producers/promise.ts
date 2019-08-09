@@ -38,6 +38,6 @@ export class PromiseStore<T> extends Store<PromiseResult<T>> {
     }
 }
 
-export const promise = <T>(promise: Promise<T>): PromiseStore<T> => {
+export const fromPromise = <T>(promise: Promise<T>): PromiseStore<T> => {
     return new PromiseStore(promise);
 };

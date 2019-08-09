@@ -26,6 +26,6 @@ export class PushStore<T> extends Store<T> {
     }
 }
 
-export const push = <T>(initialState: T): PushStore<T> => {
+export const fromValue = <T>(initialState: T): PushStore<T> => {
     return new PushStore(initialState);
 };

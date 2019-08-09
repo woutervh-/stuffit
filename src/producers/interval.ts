@@ -33,6 +33,6 @@ export class IntervalStore extends Store<number> {
     }
 }
 
-export const interval = (timeout: number): IntervalStore => {
+export const fromInterval = (timeout: number): IntervalStore => {
     return new IntervalStore(timeout);
 };
