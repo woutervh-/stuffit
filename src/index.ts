@@ -1,3 +1,4 @@
+export { Sink } from './sink';
 export { Store } from './store';
 export { Subscription } from './subscription';
 
