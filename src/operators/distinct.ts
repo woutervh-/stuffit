@@ -42,3 +42,7 @@ export class DistinctStore<T> extends Store<T> {
 export const distinct = <T>(testEquality: (previous: T, next: T) => boolean) => (source: Store<T>): DistinctStore<T> => {
     return new DistinctStore(source, testEquality);
 };
+
+export const distinctStrictEquality = <T>(source: Store<T>): DistinctStore<T> => {
+    return new DistinctStore(source, (previous, next) => previous === next);
+};
