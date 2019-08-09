@@ -23,5 +23,9 @@ export abstract class Sink<T> {
         }
     }
 
+    public hasStarted() {
+        return this.subscription !== undefined;
+    }
+
     protected abstract handleNext(value: T): void;
 }
