@@ -12,6 +12,9 @@ export class FlattenStore<T> extends Store<T> {
     }
 
     protected start() {
+        if (this.innerSubscription === undefined) {
+            this.innerSubscription = this.source.state.subscribe(this.handleNextInner);
+        }
         if (this.outerSubscription === undefined) {
             this.outerSubscription = this.source.subscribe(this.handleNextOuter);
         }
