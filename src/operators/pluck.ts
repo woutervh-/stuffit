@@ -1,19 +1,19 @@
 import { Store } from '../store';
 import { Subscription } from '../subscription';
 
-export class MapStore<T, U> extends Store<U> {
+export class PluckStore<T, K extends keyof T> extends Store<T[K]> {
     private source: Store<T>;
-    private project: (value: T) => U;
+    private key: K;
     private subscription: Subscription | undefined = undefined;
 
-    constructor(source: Store<T>, project: (value: T) => U) {
+    constructor(source: Store<T>, key: K) {
         super();
         this.source = source;
-        this.project = project;
+        this.key = key;
     }
 
     public get state() {
-        return this.project(this.source.state);
+        return this.source.state[this.key];
     }
 
     protected start() {
@@ -34,6 +34,6 @@ export class MapStore<T, U> extends Store<U> {
     }
 }
 
-export const map = <T, U>(project: (value: T) => U) => (source: Store<T>): MapStore<T, U> => {
-    return new MapStore(source, project);
+export const pluck = <T, K extends keyof T>(key: K) => (source: Store<T>): PluckStore<T, K> => {
+    return new PluckStore(source, key);
 };

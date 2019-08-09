@@ -1,19 +1,19 @@
 import { Store } from '../store';
 import { Subscription } from '../subscription';
 
-export class MapStore<T, U> extends Store<U> {
+export class PickStore<T, K extends keyof T> extends Store<{ [Key in K]: T[Key] }> {
     private source: Store<T>;
-    private project: (value: T) => U;
+    private keys: K[];
     private subscription: Subscription | undefined = undefined;
 
-    constructor(source: Store<T>, project: (value: T) => U) {
+    constructor(source: Store<T>, keys: K[]) {
         super();
         this.source = source;
-        this.project = project;
+        this.keys = keys;
     }
 
     public get state() {
-        return this.project(this.source.state);
+        return PickStore.pick(this.source.state, this.keys);
     }
 
     protected start() {
@@ -32,8 +32,16 @@ export class MapStore<T, U> extends Store<U> {
     private handleNext = () => {
         this.notify(this.state);
     }
+
+    private static pick<T, K extends keyof T>(value: T, keys: K[]): { [Key in K]: T[Key] } {
+        const picked: { [Key in K]: T[Key] } = {} as { [Key in K]: T[Key] };
+        for (const key of keys) {
+            picked[key] = value[key];
+        }
+        return picked;
+    }
 }
 
-export const map = <T, U>(project: (value: T) => U) => (source: Store<T>): MapStore<T, U> => {
-    return new MapStore(source, project);
+export const pick = <T, K extends keyof T>(...keys: K[]) => (source: Store<T>): PickStore<T, K> => {
+    return new PickStore(source, keys);
 };
