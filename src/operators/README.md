@@ -1,5 +1,8 @@
 # Stuffit Operators
 
+Operators are functions that take one or more stores as input and produce a new store as output.
+They can be applied as functions directly, or they can be used in combination with the [pipe](../store.ts) method of stores in order to make chaining easier.
+
 ## combine
 
 Combines multiple stores into a single result.
