@@ -75,12 +75,6 @@ counterStore.reset(); // "0" is logged.
 * [PushStore](src/push-store.ts)
 * [Sink](src/sink.ts)
 
-# Producers
-
-* [fromInterval](src/producers/README.md)
-* [fromPromise](src/producers/README.md)
-* [fromValue](src/producers/README.md)
-
 # Operators
 
 * [combine](src/operators/README.md#combine)
@@ -91,3 +85,9 @@ counterStore.reset(); // "0" is logged.
 * [pick](src/operators/README.md#pick)
 * [pluck](src/operators/README.md#pluck)
 * [throttle](src/operators/README.md#throttle)
+
+# Producers
+
+* [fromInterval](src/producers/README.md)
+* [fromPromise](src/producers/README.md)
+* [fromValue](src/producers/README.md)
