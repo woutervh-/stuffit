@@ -6,7 +6,7 @@ export class MapStore<T, U> extends Store<U> {
     private project: (value: T) => U;
     private subscription: Subscription | undefined = undefined;
 
-    constructor(source: Store<T>, project: (value: T) => U) {
+    public constructor(source: Store<T>, project: (value: T) => U) {
         super(project(source.state));
         this.source = source;
         this.project = project;

@@ -5,7 +5,7 @@ export class CombineStore<T extends unknown[]> extends Store<T> {
     private sources: { [K in keyof T]: Store<T[K]> };
     private subscriptions: Subscription[] | undefined = undefined;
 
-    constructor(sources: { [K in keyof T]: Store<T[K]> }) {
+    public constructor(sources: { [K in keyof T]: Store<T[K]> }) {
         super(CombineStore.combine<T>(sources));
         this.sources = sources;
     }

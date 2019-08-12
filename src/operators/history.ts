@@ -5,7 +5,7 @@ export class HistoryStore<T> extends Store<(T | undefined)[]> {
     private source: Store<T>;
     private subscription: Subscription | undefined = undefined;
 
-    constructor(source: Store<T>, frames: number) {
+    public constructor(source: Store<T>, frames: number) {
         super(HistoryStore.emptyHistory(frames));
         this.source = source;
     }

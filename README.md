@@ -3,6 +3,8 @@
 # Description
 
 Observable stores with a set of operators and producers.
+The stores behave like **hot** observables.
+They can be eager or lazy.
 
 ## Synopsis
 

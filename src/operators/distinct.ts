@@ -6,7 +6,7 @@ export class DistinctStore<T> extends Store<T> {
     private testEquality: (previous: T, next: T) => boolean;
     private subscription: Subscription | undefined = undefined;
 
-    constructor(source: Store<T>, testEquality: (previous: T, next: T) => boolean) {
+    public constructor(source: Store<T>, testEquality: (previous: T, next: T) => boolean) {
         super(source.state);
         this.source = source;
         this.testEquality = testEquality;

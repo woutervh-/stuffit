@@ -6,7 +6,7 @@ export class PluckStore<T, K extends keyof T> extends Store<T[K]> {
     private key: K;
     private subscription: Subscription | undefined = undefined;
 
-    constructor(source: Store<T>, key: K) {
+    public constructor(source: Store<T>, key: K) {
         super(source.state[key]);
         this.source = source;
         this.key = key;

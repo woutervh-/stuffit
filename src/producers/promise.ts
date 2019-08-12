@@ -2,7 +2,7 @@ import { createFulfilled, createRejected, pending, PromiseResult } from 'promise
 import { Store } from '../store';
 
 export class PromiseStore<T> extends Store<PromiseResult<T>> {
-    constructor(promise: Promise<T>) {
+    public constructor(promise: Promise<T>) {
         super(pending);
         promise.then(this.handlePromiseResult).catch(this.handlePromiseError);
     }

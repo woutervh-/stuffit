@@ -6,7 +6,7 @@ export class PickStore<T, K extends keyof T> extends Store<{ [Key in K]: T[Key] 
     private keys: K[];
     private subscription: Subscription | undefined = undefined;
 
-    constructor(source: Store<T>, keys: K[]) {
+    public constructor(source: Store<T>, keys: K[]) {
         super(PickStore.pick(source.state, keys));
         this.source = source;
         this.keys = keys;

@@ -5,4 +5,5 @@ export { history } from './history';
 export { map } from './map';
 export { pick } from './pick';
 export { pluck } from './pluck';
+export { splitObjectDynamic } from './split-object-dynamic';
 export { throttle } from './throttle';

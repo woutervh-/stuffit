@@ -6,7 +6,7 @@ export class FlattenStore<T> extends Store<T> {
     private outerSubscription: Subscription | undefined = undefined;
     private innerSubscription: Subscription | undefined = undefined;
 
-    constructor(source: Store<Store<T>>) {
+    public constructor(source: Store<Store<T>>) {
         super(source.state.state);
         this.source = source;
     }

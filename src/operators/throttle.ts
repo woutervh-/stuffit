@@ -8,7 +8,7 @@ export class ThrottleStore<T> extends Store<T> {
     private throttledState: { value: T } | undefined = undefined;
     private throttleTimeout: number | undefined = undefined;
 
-    constructor(source: Store<T>, limit: number | 'raf') {
+    public constructor(source: Store<T>, limit: number | 'raf') {
         super(source.state);
         this.source = source;
         this.limit = limit;

@@ -4,7 +4,7 @@ export class IntervalStore extends Store<number> {
     private timer: number | undefined = undefined;
     private timeout: number;
 
-    constructor(timeout: number) {
+    public constructor(timeout: number) {
         super(0);
         this.timeout = timeout;
     }
