@@ -5,12 +5,13 @@ export class ObjectPipeDynamicStore<T, U, V extends { [Key: string]: Store<T> }>
     private source: Store<V>;
     private transform: (source: Store<T>) => Store<U>;
     private sourceSubscription: Subscription | undefined = undefined;
-    private sources: { [Key in keyof T]: Store<T[Key]> };
+    private sources: V;
 
     public constructor(source: Store<V>, transform: (source: Store<T>) => Store<U>) {
         super(ObjectPipeDynamicStore.pipe(source.state, transform));
         this.source = source;
         this.transform = transform;
+        this.sources = source.state;
     }
 
     protected start() {
@@ -26,8 +27,16 @@ export class ObjectPipeDynamicStore<T, U, V extends { [Key: string]: Store<T> }>
         }
     }
 
-    private handleNext = () => {
-        this.setInnerState(this.project(this.source.state));
+    private handleNext = (newSources: V) => {
+        const newPipedSources = {} as { [Key in keyof V]: Store<U> };
+        for (const key of Object.keys(newSources)) {
+            if (key in this.sources && this.sources[key] === newSources[key]) {
+                newPipedSources[key as keyof V] = this.state[key];
+            } else {
+                newPipedSources[key as keyof V] = this.transform(newSources[key]);
+            }
+        }
+        this.setInnerState(newPipedSources);
     }
 
     private static pipe<T, U, V extends { [Key: string]: Store<T> }>(sources: V, transform: (source: Store<T>) => Store<U>) {
