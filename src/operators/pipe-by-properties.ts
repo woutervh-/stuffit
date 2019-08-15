@@ -100,6 +100,6 @@ export class PipeByPropertiesStore<T extends string, U extends { [Key in T]: unk
     }
 }
 
-export const pipeByProperties = <T extends string, U extends { [Key in T]: unknown }, V extends { [Key in T]: unknown }>(source: Store<U>, transform: (source: Store<U[T]>) => Store<V[T]>): PipeByPropertiesStore<T, U, V> => {
+export const pipeByProperties = <T extends string, U extends { [Key in T]: unknown }, V extends { [Key in T]: unknown }>(transform: (source: Store<U[T]>) => Store<V[T]>) => (source: Store<U>): PipeByPropertiesStore<T, U, V> => {
     return PipeByPropertiesStore.fromSourceAndTransform(source, transform);
 };
