@@ -37,6 +37,7 @@ export class FlattenStore<T> extends Store<T> {
             this.innerSubscription = undefined;
         }
         this.innerSubscription = store.subscribe(this.handleNextInner);
+        this.setInnerState(this.source.state.state);
     }
 
     private handleNextInner = () => {
