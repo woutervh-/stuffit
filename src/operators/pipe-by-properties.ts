@@ -5,12 +5,12 @@ import { Subscription } from '../subscription';
 export class PipeByPropertiesStore<T extends string, U extends { [Key in T]: unknown }, V extends { [Key in T]: unknown }> extends Store<V> {
     private source: Store<U>;
     private subscription: Subscription | undefined = undefined;
-    private transform: (source: Store<U[T]>) => Store<V[T]>;
+    private transform: (source: Store<U[T]>, key: T) => Store<V[T]>;
     private sources: { [Key in T]: PushStore<U[T]> };
     private targets: { [Key in T]: Store<V[T]> };
     private subscriptions = {} as { [Key in T]: Subscription };
 
-    private constructor(source: Store<U>, transform: (source: Store<U[T]>) => Store<V[T]>, initialState: V, sources: { [Key in T]: PushStore<U[T]> }, targets: { [Key in T]: Store<V[T]> }) {
+    private constructor(source: Store<U>, transform: (source: Store<U[T]>, key: T) => Store<V[T]>, initialState: V, sources: { [Key in T]: PushStore<U[T]> }, targets: { [Key in T]: Store<V[T]> }) {
         super(initialState);
         this.source = source;
         this.transform = transform;
@@ -63,7 +63,7 @@ export class PipeByPropertiesStore<T extends string, U extends { [Key in T]: unk
                 }
             } else {
                 newSources[key as T] = new PushStore<U[T]>(values[key as T]);
-                newTargets[key as T] = newSources[key as T].pipe(this.transform);
+                newTargets[key as T] = newSources[key as T].pipe((source) => this.transform(source, key as T));
                 newSubscriptions[key as T] = newTargets[key as T].subscribe(this.handleChange);
                 deletedOrAdded = true;
             }
@@ -86,20 +86,20 @@ export class PipeByPropertiesStore<T extends string, U extends { [Key in T]: unk
         this.setInnerState(result);
     }
 
-    public static fromSourceAndTransform<T extends string, U extends { [Key in T]: unknown }, V extends { [Key in T]: unknown }>(source: Store<U>, transform: (source: Store<U[T]>) => Store<V[T]>) {
+    public static fromSourceAndTransform<T extends string, U extends { [Key in T]: unknown }, V extends { [Key in T]: unknown }>(source: Store<U>, transform: (source: Store<U[T]>, key: T) => Store<V[T]>) {
         const sourceState = source.state;
         const sources = {} as { [Key in T]: PushStore<U[T]> };
         const targets = {} as { [Key in T]: Store<V[T]> };
         const targetState = {} as V;
         for (const key of Object.keys(sourceState)) {
             sources[key as T] = new PushStore<U[T]>(sourceState[key as T]);
-            targets[key as T] = sources[key as T].pipe(transform);
+            targets[key as T] = sources[key as T].pipe((source) => transform(source, key as T));
             targetState[key as T] = targets[key as T].state;
         }
         return new PipeByPropertiesStore(source, transform, targetState, sources, targets);
     }
 }
 
-export const pipeByProperties = <T extends string, U extends { [Key in T]: unknown }, V extends { [Key in T]: unknown }>(transform: (source: Store<U[T]>) => Store<V[T]>) => (source: Store<U>): PipeByPropertiesStore<T, U, V> => {
+export const pipeByProperties = <T extends string, U extends { [Key in T]: unknown }, V extends { [Key in T]: unknown }>(transform: (source: Store<U[T]>, key: T) => Store<V[T]>) => (source: Store<U>): PipeByPropertiesStore<T, U, V> => {
     return PipeByPropertiesStore.fromSourceAndTransform(source, transform);
 };
