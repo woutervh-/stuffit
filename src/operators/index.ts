@@ -6,4 +6,5 @@ export { map } from './map';
 export { pick } from './pick';
 export { pipeByProperties } from './pipe-by-properties';
 export { pluck } from './pluck';
+export { splitByProperties } from './split-by-properties';
 export { throttle } from './throttle';
