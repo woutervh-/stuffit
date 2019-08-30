@@ -45,7 +45,7 @@ public hasStarted(): boolean;
 
 ## handleNext
 
-ℹ️ *`protected` method - only relevant to implementers of a `Store` class.*
+ℹ️ *protected method - only relevant to implementers of the `Sink` class.*
 
 This is the action taken by the sink.
 It will be called when the sink is started.

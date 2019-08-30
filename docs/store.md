@@ -61,7 +61,7 @@ public compose<U>(transform: (source: this) => U): U;
 
 ## setInnerState
 
-ℹ️ *`protected` method - only relevant to implementers of a `Store` class.*
+ℹ️ *protected method - only relevant to implementers of a `Store` class.*
 
 A class which extends the Store class can decide to change the state of the Store at any moment.
 This can be done using the `setInnerState` method.
@@ -73,7 +73,7 @@ protected setInnerState(state: T);
 
 ## start
 
-ℹ️ *`protected` method - only relevant to implementers of a `Store` class.*
+ℹ️ *protected method - only relevant to implementers of a `Store` class.*
 
 A store starts with 0 subscribers in a deactivated state.
 When the number of subscriptions goes up from 0 to 1, the store will enter the activated state.
@@ -87,7 +87,7 @@ protected abstract start(): void;
 
 ## stop
 
-ℹ️ *`protected` method - only relevant to implementers of a `Store` class.*
+ℹ️ *protected method - only relevant to implementers of the `Store` class.*
 
 A store with 1 or more subscribers is in an activated state.
 When the number of subscriptions goes from 1 to 0, the store will enter the deactivated state.
