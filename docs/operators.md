@@ -1,9 +1,11 @@
 # Stuffit Operators
 
-Operators are functions that take one or more stores as input and produce a new store as output.
-They can be applied as functions directly, or they can be used in combination with the [pipe](../store.ts) method of stores in order to make chaining easier.
+Operators are (higher-order) functions that take one or more stores as input and produce a new store as output.
+They can be applied as functions directly, or they can be used in combination with the [pipe](store.md#pipe) method of stores in order to make chaining easier.
 
 ## combine
+
+*Lazy operator*
 
 Combines multiple stores into a single result.
 Whenever one of the source stores emits a new value, the combine operator will update its state and emit a new combination of all the source stores values.
@@ -26,6 +28,8 @@ Stuffit.Operators
 
 ## distinct
 
+*Lazy operator*
+
 Will only update the state and emit a new value when the value coming from the source store is distinct from its previous value.
 
 *Example*
@@ -47,6 +51,8 @@ store.setState(1); // Nothing happens.
 
 ## flatten
 
+*Lazy operator*
+
 Flattens nested stores.
 If a store ("outer store") emits other stores ("inner stores") as its values, this operator will emit the values from the last seen "inner store".
 
@@ -64,7 +70,9 @@ outerStore.setState(Stuffit.Producers.fromValue(10)); // "10" will be logged".
 outerStore.setState(Stuffit.Producers.fromInterval(5000)); // Will log a number every 5 seconds: "0", "1", "2", ...
 ```
 
-# history
+## history
+
+*Lazy operator*
 
 Keeps track of previous values emitted by the source.
 The number of values it will remember can be specified as a parameter to the operator.
@@ -91,7 +99,9 @@ Stuffit.Producers.fromInterval(1000)
 // ...
 ```
 
-# map
+## map
+
+*Lazy operator*
 
 Maps values from the source store using a project function.
 
@@ -108,7 +118,9 @@ store.setState(1);
 console.log(mappedStore.state); // WIll log "2".
 ```
 
-# pick
+## pick
+
+*Lazy operator*
 
 Will pick keys/values from the objects emitted by the source store.
 Only the keys/values specified by the parameter to the pick operator will be included in the emitted value.
@@ -123,7 +135,9 @@ const pickedStore = store.pipe(Stuffit.Operators.pick('first', 'last'));
 console.log(pickedStores.state); // Will log { first: 'John', last: 'Doe' }.
 ```
 
-# pluck
+## pluck
+
+*Lazy operator*
 
 Take a single value from the objects emitted by the source store.
 The given parameter is used as the key to choose the value from the objects.
@@ -144,7 +158,9 @@ plucked.subscribe(console.log);
 store.setState({ first: 'Jane', last: 'Doe' }); // Will log "Jane".
 ```
 
-# throttle
+## throttle
+
+*Lazy operator*
 
 Throttles the source store such that the throttled store will only update at most once during the timeout period specified by the parameter.
 Trailing updates are remembered and will cause the throttled store to update.

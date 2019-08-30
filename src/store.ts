@@ -29,11 +29,11 @@ export abstract class Store<T> {
         };
     }
 
-    public pipe<U>(transform: (source: this) => Store<U>) {
+    public pipe<U>(transform: (source: this) => Store<U>): Store<U> {
         return transform(this);
     }
 
-    public compose<U>(transform: (source: this) => U) {
+    public compose<U>(transform: (source: this) => U): U {
         return transform(this);
     }
 

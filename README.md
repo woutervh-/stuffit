@@ -2,7 +2,7 @@
 
 # Description
 
-Observable stores with a set of operators and producers.
+Observable state stores with a set of operators and producers.
 The stores behave like **hot** observables.
 They can be eager or lazy.
 
@@ -71,25 +71,44 @@ counterStore.increment(); // "2" is logged.
 counterStore.reset(); // "0" is logged.
 ```
 
-# Classes
+# Documentation
 
-* [Store](src/store.ts)
-* [PushStore](src/push-store.ts)
-* [Sink](src/sink.ts)
+In the world of stores we can think of data flowing to and from three different kind of objects:
 
-# Operators
+- [Producers](docs/producers.md): they create data and consume none.
+- [Sinks](docs/sink.md): they consume data but do not produce any.
+- [Operators](docs/operators.md): they take data from one or more source stores and transform it into new data. In a sense they're both a producer and a sink.
 
-* [combine](src/operators/README.md#combine)
-* [distinct](src/operators/README.md#distinct)
-* [flatten](src/operators/README.md#flatten)
-* [history](src/operators/README.md#history)
-* [map](src/operators/README.md#map)
-* [pick](src/operators/README.md#pick)
-* [pluck](src/operators/README.md#pluck)
-* [throttle](src/operators/README.md#throttle)
+## Classes
 
-# Producers
+* [Store](docs/store.md)
+* [PushStore](docs/push-store.md)
+* [Sink](docs/sinks.md#Sink)
 
-* [fromInterval](src/producers/README.md)
-* [fromPromise](src/producers/README.md)
-* [fromValue](src/producers/README.md)
+## Operators
+
+* [combine](docs/operators.md#combine)
+* [distinct](docs/operators.md#distinct)
+* [flatten](docs/operators.md#flatten)
+* [history](docs/operators.md#history)
+* [map](docs/operators.md#map)
+* [pick](docs/operators.md#pick)
+* [pluck](docs/operators.md#pluck)
+* [throttle](docs/operators.md#throttle)
+
+## Producers
+
+* [fromInterval](docs/producers.md#fromInterval)
+* [fromPromise](docs/producers.md#fromPromise)
+* [fromValue](docs/producers.md#fromValue)
+
+## Sinks
+
+* [simple](docs/sinks.md#simple)
+
+# Usage with other libraries
+
+Stuffit can be used to save the state of your application and it is agnostic of the frameworks you use.
+In principle you have the responsibility to connect the stores to your application. To make things easy however you can use some existing "plugins" to do the work for you:
+
+- For connecting to React: https://www.npmjs.com/package/stuffit-react
