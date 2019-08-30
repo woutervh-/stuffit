@@ -76,7 +76,7 @@ counterStore.reset(); // "0" is logged.
 In the world of stores we can think of data flowing to and from three different kind of objects:
 
 - [Producers](docs/producers.md): they create data and consume none.
-- [Sinks](docs/sink.md): they consume data but do not produce any.
+- [Sinks](docs/sinks.md): they consume data but do not produce any.
 - [Operators](docs/operators.md): they take data from one or more source stores and transform it into new data. In a sense they're both a producer and a sink.
 
 ## Classes
