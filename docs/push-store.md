@@ -1,6 +1,6 @@
 # Push-store
 
-*Source: [src/store.ts](../src/push-store.ts)*
+*Source: [src/push-store.ts](../src/push-store.ts)*
 
 An implementation of [Store](store.md) with a very simple interface which allows you to push new state to the store.
 
