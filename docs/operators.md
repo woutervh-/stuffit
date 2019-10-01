@@ -26,7 +26,7 @@ Stuffit.Operators
     // Will log [0, 'a'], [1, 'a'], [2, 'a']...
 ```
 
-## distinct
+## distinct (aliases: skip)
 
 *Lazy operator*
 

@@ -88,7 +88,7 @@ In the world of stores we can think of data flowing to and from three different 
 ## Operators
 
 * [combine](docs/operators.md#combine)
-* [distinct](docs/operators.md#distinct)
+* [distinct](docs/operators.md#distinct) (aliases: skip)
 * [flatten](docs/operators.md#flatten)
 * [history](docs/operators.md#history)
 * [map](docs/operators.md#map)

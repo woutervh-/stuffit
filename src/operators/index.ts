@@ -1,5 +1,8 @@
 export { combine, combineApply } from './combine';
-export { distinct, distinctStrictEquality } from './distinct';
+import { distinct, distinctStrictEquality } from './distinct';
+export { distinct, distinctStrictEquality };
+export const skip = distinct;
+export const skipStrictEquality = distinctStrictEquality;
 export { flatten } from './flatten';
 export { history } from './history';
 export { map } from './map';
