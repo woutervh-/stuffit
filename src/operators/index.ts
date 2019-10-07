@@ -1,4 +1,5 @@
 export { combine, combineApply } from './combine';
+export { combineDynamic } from './combine-dynamic';
 import { distinct, distinctStrictEquality } from './distinct';
 export { distinct, distinctStrictEquality };
 export const skip = distinct;
