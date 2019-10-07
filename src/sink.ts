@@ -14,6 +14,7 @@ export abstract class Sink<T> {
         if (!this.subscription) {
             this.subscription = this.source.subscribe((value) => this.handleNext(value));
         }
+        return this;
     }
 
     public stop() {
@@ -21,6 +22,7 @@ export abstract class Sink<T> {
             this.subscription.unsubscribe();
             this.subscription = undefined;
         }
+        return this;
     }
 
     public hasStarted(): boolean {
