@@ -158,6 +158,29 @@ plucked.subscribe(console.log);
 store.setState({ first: 'Jane', last: 'Doe' }); // Will log "Jane".
 ```
 
+## reduce
+
+*Lazy operator*
+
+Take an initial value and a reduce function and apply the reduce function as new values arrive from the source.
+
+*Example*
+
+```typescript
+import * as Stuffit from 'stuffit';
+
+const store = new Stuffit.PushStore(2);
+
+const reduced = store
+    .pipe(Stuffit.Operators.reduce((previous, next) => previous + next, 1));
+
+console.log(reduced.state); // Will log "3" because initially the supplied initial value 1 and the initial source value 2 and reduced to 1 + 2.
+
+store.setState(3);
+
+console.log(reducer.state); // Will log "6".
+```
+
 ## throttle
 
 *Lazy operator*

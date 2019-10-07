@@ -7,7 +7,7 @@ export class ReduceStore<T, U> extends Store<U> {
     private reduce: (accumulator: U, currentValue: T) => U;
 
     constructor(source: Store<T>, reduce: (accumulator: U, currentValue: T) => U, initialValue: U) {
-        super(initialValue);
+        super(reduce(initialValue, source.state));
         this.source = source;
         this.reduce = reduce;
     }
