@@ -88,12 +88,14 @@ In the world of stores we can think of data flowing to and from three different 
 ## Operators
 
 * [combine](docs/operators.md#combine)
+* [debounce](docs/operators.md#debounce)
 * [distinct](docs/operators.md#distinct) (aliases: skip)
 * [flatten](docs/operators.md#flatten)
 * [history](docs/operators.md#history)
 * [map](docs/operators.md#map)
 * [pick](docs/operators.md#pick)
 * [pluck](docs/operators.md#pluck)
+* [reduce](docs/operators.md#reduce)
 * [throttle](docs/operators.md#throttle)
 
 ## Producers

@@ -3,6 +3,33 @@
 Operators are (higher-order) functions that take one or more stores as input and produce a new store as output.
 They can be applied as functions directly, or they can be used in combination with the [pipe](store.md#pipe) method of stores in order to make chaining easier.
 
+## debounce
+
+Debounces incoming state changes from the source store.
+The parameter `wait` dictates the number of milliseconds to debounce for.
+The parameter `immediate` dictates whether or not to immediately update after the first state change or not.
+
+*Example*
+
+```typescript
+import * as Stuffit from 'stuffit';
+
+const store = new Stuffit.PushStore(0);
+const debounced = store.pipe(Stuffit.Operators.debounce(50));
+
+console.log(debounced.state); // Will log "0".
+store.setState(1);
+console.log(debounced.state); // Will log "0".
+store.setState(2);
+console.log(debounced.state); // Will log "0".
+
+setTimeout(() => {
+    console.log(debounced.state); // Will log "2".
+    store.setState(3);
+    console.log(debounced.state); // Will log "2".
+}, 100);
+```
+
 ## combine
 
 *Lazy operator*

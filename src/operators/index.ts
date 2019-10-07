@@ -2,6 +2,7 @@ export { combine, combineApply } from './combine';
 export { combineDynamic } from './combine-dynamic';
 import { distinct, distinctStrictEquality } from './distinct';
 export { distinct, distinctStrictEquality };
+export { debounce } from './debounce';
 export const skip = distinct;
 export const skipStrictEquality = distinctStrictEquality;
 export { flatten } from './flatten';
