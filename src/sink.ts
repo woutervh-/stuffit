@@ -1,7 +1,7 @@
 import { Store } from './store';
 import { Subscription } from './subscription';
 
-export abstract class Sink<T> {
+export abstract class Sink<T = unknown> {
     private source: Store<T>;
     private subscription: Subscription | undefined = undefined;
 
