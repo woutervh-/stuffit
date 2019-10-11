@@ -1,16 +1,28 @@
-export { combine, combineApply } from './combine';
-export { combineDynamic } from './combine-dynamic';
+// Import aliased operators:
+import { arrayCombine, arrayCombineApply } from './array-combine';
+import { arrayCombineDynamic } from './array-combine-dynamic';
 import { distinct, distinctStrictEquality } from './distinct';
+
+// Export aliased operators:
+export { arrayCombine, arrayCombineApply };
+export { arrayCombineDynamic };
 export { distinct, distinctStrictEquality };
-export { debounce } from './debounce';
+
+// Export aliases:
+export const combine = arrayCombine;
+export const combineApply = arrayCombineApply;
+export const combineDynamic = arrayCombineDynamic;
 export const skip = distinct;
 export const skipStrictEquality = distinctStrictEquality;
+
+export { debounce } from './debounce';
 export { flatten } from './flatten';
 export { history } from './history';
 export { map } from './map';
+export { objectCombineProperties } from './object-combine-properties';
+export { objectPipeProperties } from './object-pipe-properties';
+export { objectSplitProperties } from './object-split-properties';
 export { pick } from './pick';
-export { pipeByProperties } from './pipe-by-properties';
 export { pluck } from './pluck';
 export { reduce } from './reduce';
-export { splitByProperties } from './split-by-properties';
 export { throttle } from './throttle';

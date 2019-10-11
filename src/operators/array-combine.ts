@@ -1,12 +1,12 @@
 import { Store } from '../store';
 import { Subscription } from '../subscription';
 
-export class CombineStore<T extends unknown[]> extends Store<T> {
+export class ArrayCombineStore<T extends unknown[]> extends Store<T> {
     private sources: { [K in keyof T]: Store<T[K]> };
     private subscriptions: Subscription[] | undefined = undefined;
 
     public constructor(sources: { [K in keyof T]: Store<T[K]> }) {
-        super(CombineStore.combine<T>(sources));
+        super(ArrayCombineStore.combine<T>(sources));
         this.sources = sources;
     }
 
@@ -30,7 +30,7 @@ export class CombineStore<T extends unknown[]> extends Store<T> {
     }
 
     private handleNext = () => {
-        this.setInnerState(CombineStore.combine<T>(this.sources));
+        this.setInnerState(ArrayCombineStore.combine<T>(this.sources));
     }
 
     private static combine<T extends unknown[]>(sources: { [K in keyof T]: Store<T[K]> }) {
@@ -38,10 +38,10 @@ export class CombineStore<T extends unknown[]> extends Store<T> {
     }
 }
 
-export const combine = <T extends unknown[]>(...sources: { [K in keyof T]: Store<T[K]> }): CombineStore<T> => {
-    return new CombineStore<T>(sources);
+export const arrayCombine = <T extends unknown[]>(...sources: { [K in keyof T]: Store<T[K]> }): ArrayCombineStore<T> => {
+    return new ArrayCombineStore<T>(sources);
 };
 
-export const combineApply = <T extends unknown[]>(sources: { [K in keyof T]: Store<T[K]> }): CombineStore<T> => {
-    return new CombineStore<T>(sources);
+export const arrayCombineApply = <T extends unknown[]>(sources: { [K in keyof T]: Store<T[K]> }): ArrayCombineStore<T> => {
+    return new ArrayCombineStore<T>(sources);
 };

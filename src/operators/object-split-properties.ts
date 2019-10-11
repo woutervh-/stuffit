@@ -2,12 +2,12 @@ import { PushStore } from '../push-store';
 import { Store } from '../store';
 import { Subscription } from '../subscription';
 
-export class SplitByPropertiesStore<T extends { [Key: string]: unknown }> extends Store<{ [Key in keyof T]: Store<T[Key]> }> {
+export class ObjectSplitPropertiesStore<T extends { [Key: string]: unknown }> extends Store<{ [Key in keyof T]: Store<T[Key]> }> {
     private source: Store<T>;
     private subscription: Subscription | undefined = undefined;
 
     public constructor(source: Store<T>) {
-        super(SplitByPropertiesStore.split(source.state));
+        super(ObjectSplitPropertiesStore.split(source.state));
         this.source = source;
     }
 
@@ -67,6 +67,6 @@ export class SplitByPropertiesStore<T extends { [Key: string]: unknown }> extend
     }
 }
 
-export const splitByProperties = <T extends { [Key: string]: unknown }>(source: Store<T>): SplitByPropertiesStore<T> => {
-    return new SplitByPropertiesStore(source);
+export const objectSplitProperties = <T extends { [Key: string]: unknown }>(source: Store<T>): ObjectSplitPropertiesStore<T> => {
+    return new ObjectSplitPropertiesStore(source);
 };

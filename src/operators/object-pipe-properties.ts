@@ -2,7 +2,7 @@ import { PushStore } from '../push-store';
 import { Store } from '../store';
 import { Subscription } from '../subscription';
 
-export class PipeByPropertiesStore<T extends string, U extends { [Key in T]: unknown }, V extends { [Key in T]: unknown }> extends Store<V> {
+export class ObjectPipePropertiesStore<T extends string, U extends { [Key in T]: unknown }, V extends { [Key in T]: unknown }> extends Store<V> {
     private source: Store<U>;
     private subscription: Subscription | undefined = undefined;
     private transform: (source: Store<U[T]>, key: T) => Store<V[T]>;
@@ -96,10 +96,10 @@ export class PipeByPropertiesStore<T extends string, U extends { [Key in T]: unk
             targets[key as T] = sources[key as T].pipe((source) => transform(source, key as T));
             targetState[key as T] = targets[key as T].state;
         }
-        return new PipeByPropertiesStore(source, transform, targetState, sources, targets);
+        return new ObjectPipePropertiesStore(source, transform, targetState, sources, targets);
     }
 }
 
-export const pipeByProperties = <T extends string, U extends { [Key in T]: unknown }, V extends { [Key in T]: unknown }>(transform: (source: Store<U[T]>, key: T) => Store<V[T]>) => (source: Store<U>): PipeByPropertiesStore<T, U, V> => {
-    return PipeByPropertiesStore.fromSourceAndTransform(source, transform);
+export const objectPipeProperties = <T extends string, U extends { [Key in T]: unknown }, V extends { [Key in T]: unknown }>(transform: (source: Store<U[T]>, key: T) => Store<V[T]>) => (source: Store<U>): ObjectPipePropertiesStore<T, U, V> => {
+    return ObjectPipePropertiesStore.fromSourceAndTransform(source, transform);
 };

@@ -1,14 +1,14 @@
 import { Store } from '../store';
 import { Subscription } from '../subscription';
 
-export class CombineDynamicStore<T extends unknown[]> extends Store<T> {
+export class ArrayCombineDynamicStore<T extends unknown[]> extends Store<T> {
     private source: Store<{ [K in keyof T]: Store<T[K]> }>;
     private sourceSubscription: Subscription | undefined = undefined;
     private sources: Store<T[number]>[] = [];
     private subscriptions: Subscription[] = [];
 
     public constructor(source: Store<{ [K in keyof T]: Store<T[K]> }>) {
-        super(CombineDynamicStore.combine<T>(source));
+        super(ArrayCombineDynamicStore.combine<T>(source));
         this.source = source;
     }
 
@@ -52,11 +52,11 @@ export class CombineDynamicStore<T extends unknown[]> extends Store<T> {
         }
         this.subscriptions = newSubscriptions;
 
-        this.setInnerState(CombineDynamicStore.combine<T>(this.source));
+        this.setInnerState(ArrayCombineDynamicStore.combine<T>(this.source));
     }
 
     private handleNext = () => {
-        this.setInnerState(CombineDynamicStore.combine<T>(this.source));
+        this.setInnerState(ArrayCombineDynamicStore.combine<T>(this.source));
     }
 
     private static combine<T extends unknown[]>(source: Store<{ [K in keyof T]: Store<T[K]> }>) {
@@ -64,6 +64,6 @@ export class CombineDynamicStore<T extends unknown[]> extends Store<T> {
     }
 }
 
-export const combineDynamic = <T extends unknown[]>(source: Store<{ [K in keyof T]: Store<T[K]> }>): CombineDynamicStore<T> => {
-    return new CombineDynamicStore<T>(source);
+export const arrayCombineDynamic = <T extends unknown[]>(source: Store<{ [K in keyof T]: Store<T[K]> }>): ArrayCombineDynamicStore<T> => {
+    return new ArrayCombineDynamicStore<T>(source);
 };
