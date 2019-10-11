@@ -2,7 +2,7 @@ import { PushStore } from '../push-store';
 import { Store } from '../store';
 import { Subscription } from '../subscription';
 
-export class ObjectSplitPropertiesStore<T extends { [Key: string]: unknown }> extends Store<{ [Key in keyof T]: Store<T[Key]> }> {
+export class ObjectSplitPropertiesStore<T extends {}> extends Store<{ [Key in keyof T]: Store<T[Key]> }> {
     private source: Store<T>;
     private subscription: Subscription | undefined = undefined;
 
@@ -42,13 +42,13 @@ export class ObjectSplitPropertiesStore<T extends { [Key: string]: unknown }> ex
         for (const key of newKeys) {
             if (!oldKeys.has(key)) {
                 // Add stores with new keys.
-                next[key as keyof T] = new PushStore<T[keyof T]>(value[key] as T[keyof T]);
+                next[key as keyof T] = new PushStore<T[keyof T]>(value[key as keyof T] as T[keyof T]);
                 deletedOrAdded = true;
             } else {
                 next[key as keyof T] = this.state[key as keyof T];
                 // Update existing stores if value has changed.
-                if (next[key as keyof T].state !== value[key]) {
-                    (next[key as keyof T] as PushStore<T[keyof T]>).setState(value[key] as T[keyof T]);
+                if (next[key as keyof T].state !== value[key as keyof T]) {
+                    (next[key as keyof T] as PushStore<T[keyof T]>).setState(value[key as keyof T] as T[keyof T]);
                 }
             }
         }
@@ -67,6 +67,6 @@ export class ObjectSplitPropertiesStore<T extends { [Key: string]: unknown }> ex
     }
 }
 
-export const objectSplitProperties = <T extends { [Key: string]: unknown }>(source: Store<T>): ObjectSplitPropertiesStore<T> => {
+export const objectSplitProperties = <T extends {}>(source: Store<T>): ObjectSplitPropertiesStore<T> => {
     return new ObjectSplitPropertiesStore(source);
 };
