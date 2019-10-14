@@ -1,17 +1,24 @@
 // Import aliased operators:
 import { arrayCombine, arrayCombineApply } from './array-combine';
 import { arrayCombineDynamic } from './array-combine-dynamic';
+import { arrayMerge, arrayMergeApply } from './array-merge';
+import { arrayMergeDynamic } from './array-merge-dynamic';
 import { distinct, distinctStrictEquality } from './distinct';
 
 // Export aliased operators:
 export { arrayCombine, arrayCombineApply };
 export { arrayCombineDynamic };
+export { arrayMerge, arrayMergeApply };
+export { arrayMergeDynamic };
 export { distinct, distinctStrictEquality };
 
 // Export aliases:
 export const combine = arrayCombine;
 export const combineApply = arrayCombineApply;
 export const combineDynamic = arrayCombineDynamic;
+export const merge = arrayMerge;
+export const mergeApply = arrayMergeApply;
+export const mergeDynamic = arrayMergeDynamic;
 export const skip = distinct;
 export const skipStrictEquality = distinctStrictEquality;
 
