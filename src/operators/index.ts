@@ -22,6 +22,7 @@ export const mergeDynamic = arrayMergeDynamic;
 export const skip = distinct;
 export const skipStrictEquality = distinctStrictEquality;
 
+export { conditional } from './conditional';
 export { debounce } from './debounce';
 export { flatten } from './flatten';
 export { history } from './history';
