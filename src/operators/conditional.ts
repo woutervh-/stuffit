@@ -1,19 +1,17 @@
 import { Store } from '../store';
 import { Subscription } from '../subscription';
 
-export class ConditionalStore<T, U, V> extends Store<U | V> {
-    private source: Store<T>;
-    private test: (value: T) => boolean;
-    private sourceIf: Store<U>;
-    private sourceElse: Store<V>;
+export class ConditionalStore<T, U> extends Store<T | U> {
+    private source: Store<boolean>;
+    private sourceIf: Store<T>;
+    private sourceElse: Store<U>;
     private sourceSubscription: Subscription | undefined = undefined;
     private ifSubscription: Subscription | undefined = undefined;
     private elseSubscription: Subscription | undefined = undefined;
 
-    public constructor(source: Store<T>, test: (value: T) => boolean, sourceIf: Store<U>, sourceElse: Store<V>) {
-        super(ConditionalStore.conditional(source.state, test, sourceIf.state, sourceElse.state));
+    public constructor(source: Store<boolean>, sourceIf: Store<T>, sourceElse: Store<U>) {
+        super(ConditionalStore.conditional(source.state, sourceIf.state, sourceElse.state));
         this.source = source;
-        this.test = test;
         this.sourceIf = sourceIf;
         this.sourceElse = sourceElse;
     }
@@ -41,7 +39,7 @@ export class ConditionalStore<T, U, V> extends Store<U | V> {
     }
 
     private handleSourceNext = () => {
-        if (this.test(this.source.state)) {
+        if (this.source.state) {
             if (this.elseSubscription) {
                 this.elseSubscription.unsubscribe();
                 this.elseSubscription = undefined;
@@ -62,15 +60,15 @@ export class ConditionalStore<T, U, V> extends Store<U | V> {
         }
     }
 
-    private handleBranchNext = (value: U | V) => {
+    private handleBranchNext = (value: T | U) => {
         this.setInnerState(value);
     }
 
-    private static conditional<T, U, V>(state: T, test: (value: T) => boolean, stateIf: U, stateElse: V): U | V {
-        return test(state) ? stateIf : stateElse;
+    private static conditional<T, U>(state: boolean, stateIf: T, stateElse: U): T | U {
+        return state ? stateIf : stateElse;
     }
 }
 
-export const conditional = <T>(test: (value: T) => boolean) => <U, V>(sourceIf: Store<U>, sourceElse: Store<V>) => (source: Store<T>): ConditionalStore<T, U, V> => {
-    return new ConditionalStore(source, test, sourceIf, sourceElse);
+export const conditional = <T, U>(sourceIf: Store<T>, sourceElse: Store<U>) => (source: Store<boolean>): ConditionalStore<T, U> => {
+    return new ConditionalStore(source, sourceIf, sourceElse);
 };
