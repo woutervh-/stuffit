@@ -15,7 +15,6 @@ export class ThrottleStore<T> extends Store<T> {
     }
 
     protected start() {
-        this.setInnerState(this.source.state);
         if (this.subscription === undefined) {
             this.subscription = this.source.subscribe(this.handleNext);
         }
