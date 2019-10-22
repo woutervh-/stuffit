@@ -13,6 +13,7 @@ export class PluckStore<T, K extends keyof T> extends Store<T[K]> {
     }
 
     protected start() {
+        this.setInnerState(this.source.state[this.key]);
         if (this.subscription === undefined) {
             this.subscription = this.source.subscribe(this.handleNext);
         }

@@ -13,6 +13,7 @@ export class PickStore<T, K extends keyof T> extends Store<{ [Key in K]: T[Key] 
     }
 
     protected start() {
+        this.setInnerState(PickStore.pick(this.source.state, this.keys));
         if (this.subscription === undefined) {
             this.subscription = this.source.subscribe(this.handleNext);
         }

@@ -13,6 +13,7 @@ export class MapStore<T, U> extends Store<U> {
     }
 
     protected start() {
+        this.setInnerState(this.project(this.source.state));
         if (this.subscription === undefined) {
             this.subscription = this.source.subscribe(this.handleNext);
         }
