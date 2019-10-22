@@ -8,15 +8,16 @@ export class ObjectCombinePropertiesStore<T extends {}> extends Store<T> {
     private subscriptions = {} as { [Key in keyof T]: Subscription };
 
     public constructor(source: Store<{ [Key in keyof T]: Store<T[Key]> }>) {
-        super(ObjectCombinePropertiesStore.combine(source.state));
+        super();
         this.source = source;
     }
 
+    public get state() {
+        return ObjectCombinePropertiesStore.combine(this.source.state);
+    }
+
     protected start() {
-        for (const key of Object.keys(this.source.state)) {
-            this.sources[key as keyof T] = this.source.state[key as keyof T] as Store<T[keyof T]>;
-            this.subscriptions[key as keyof T] = this.source.state[key as keyof T].subscribe(this.handleChange);
-        }
+        this.handleNext(this.source.state);
         if (this.subscription === undefined) {
             this.subscription = this.source.subscribe(this.handleNext);
         }
@@ -58,7 +59,7 @@ export class ObjectCombinePropertiesStore<T extends {}> extends Store<T> {
     }
 
     private handleChange = () => {
-        this.setInnerState(ObjectCombinePropertiesStore.combine(this.source.state));
+        this.notify();
     }
 
     private static combine<T extends { [Key: string]: unknown }>(sources: { [Key in keyof T]: Store<T[Key]> }): T {

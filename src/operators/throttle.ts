@@ -9,9 +9,13 @@ export class ThrottleStore<T> extends Store<T> {
     private throttleTimeout: number | undefined = undefined;
 
     public constructor(source: Store<T>, limit: number | 'raf') {
-        super(source.state);
+        super();
         this.source = source;
         this.limit = limit;
+    }
+
+    public get state() {
+        return this.source.state;
     }
 
     protected start() {

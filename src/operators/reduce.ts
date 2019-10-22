@@ -5,11 +5,17 @@ export class ReduceStore<T, U> extends Store<U> {
     private source: Store<T>;
     private subscription: Subscription | undefined = undefined;
     private reduce: (accumulator: U, currentValue: T) => U;
+    private innerState: U;
 
     constructor(source: Store<T>, reduce: (accumulator: U, currentValue: T) => U, initialValue: U) {
-        super(reduce(initialValue, source.state));
+        super();
         this.source = source;
         this.reduce = reduce;
+        this.innerState = reduce(initialValue, source.state);
+    }
+
+    public get state() {
+        return this.innerState;
     }
 
     protected start() {
@@ -26,7 +32,8 @@ export class ReduceStore<T, U> extends Store<U> {
     }
 
     private handleNext = (value: T) => {
-        this.setInnerState(this.reduce(this.state, value));
+        this.innerState = this.reduce(this.state, value);
+        this.notify();
     }
 }
 

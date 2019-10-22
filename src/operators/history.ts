@@ -4,10 +4,16 @@ import { Subscription } from '../subscription';
 export class HistoryStore<T> extends Store<(T | undefined)[]> {
     private source: Store<T>;
     private subscription: Subscription | undefined = undefined;
+    private innerState: (T | undefined)[];
 
     public constructor(source: Store<T>, frames: number) {
-        super(HistoryStore.emptyHistory(frames));
+        super();
         this.source = source;
+        this.innerState = HistoryStore.emptyHistory(frames);
+    }
+
+    public get state() {
+        return this.innerState;
     }
 
     protected start() {
@@ -24,10 +30,11 @@ export class HistoryStore<T> extends Store<(T | undefined)[]> {
     }
 
     private handleNext = (value: T) => {
-        const history = this.state.slice();
+        const history = this.innerState.slice();
         history.shift();
         history.push(value);
-        this.setInnerState(history);
+        this.innerState = history;
+        this.notify();
     }
 
     private static emptyHistory(frames: number) {

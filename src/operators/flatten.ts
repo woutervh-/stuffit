@@ -7,8 +7,12 @@ export class FlattenStore<T> extends Store<T> {
     private innerSubscription: Subscription | undefined = undefined;
 
     public constructor(source: Store<Store<T>>) {
-        super(source.state.state);
+        super();
         this.source = source;
+    }
+
+    public get state() {
+        return this.source.state.state;
     }
 
     protected start() {
@@ -37,11 +41,11 @@ export class FlattenStore<T> extends Store<T> {
             this.innerSubscription = undefined;
         }
         this.innerSubscription = store.subscribe(this.handleNextInner);
-        this.setInnerState(this.source.state.state);
+        this.notify();
     }
 
     private handleNextInner = () => {
-        this.setInnerState(this.source.state.state);
+        this.notify();
     }
 }
 

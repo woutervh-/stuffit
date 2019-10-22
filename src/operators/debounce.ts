@@ -9,10 +9,14 @@ export class DebounceStore<T> extends Store<T> {
     private timeout: number | undefined = undefined;
 
     public constructor(source: Store<T>, wait: number, immediate?: boolean) {
-        super(source.state);
+        super();
         this.source = source;
         this.wait = wait;
         this.immediate = !!immediate;
+    }
+
+    public get state() {
+        return this.source.state;
     }
 
     protected start() {
@@ -35,17 +39,17 @@ export class DebounceStore<T> extends Store<T> {
         }
     }
 
-    private handleNext = (value: T) => {
+    private handleNext = () => {
         const callNow = this.immediate && this.timeout === undefined;
         this.clearTimeout();
         this.timeout = setTimeout(() => {
             this.timeout = undefined;
             if (!this.immediate) {
-                this.setInnerState(value);
+                this.notify();
             }
         }, this.wait);
         if (callNow) {
-            this.setInnerState(value);
+            this.notify();
         }
     }
 }

@@ -8,11 +8,16 @@ export class ArrayCombineDynamicStore<T extends unknown[]> extends Store<T> {
     private subscriptions: Subscription[] = [];
 
     public constructor(source: Store<{ [K in keyof T]: Store<T[K]> }>) {
-        super(ArrayCombineDynamicStore.combine<T>(source));
+        super();
         this.source = source;
     }
 
+    public get state() {
+        return ArrayCombineDynamicStore.combine<T>(this.source);
+    }
+
     protected start() {
+        this.handleSourceNext(this.source.state);
         if (this.sourceSubscription === undefined) {
             this.sourceSubscription = this.source.subscribe(this.handleSourceNext);
         }
@@ -51,11 +56,11 @@ export class ArrayCombineDynamicStore<T extends unknown[]> extends Store<T> {
         }
         this.subscriptions = newSubscriptions;
 
-        this.setInnerState(ArrayCombineDynamicStore.combine<T>(this.source));
+        this.notify();
     }
 
     private handleNext = () => {
-        this.setInnerState(ArrayCombineDynamicStore.combine<T>(this.source));
+        this.notify();
     }
 
     private static combine<T extends unknown[]>(source: Store<{ [K in keyof T]: Store<T[K]> }>) {

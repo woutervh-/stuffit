@@ -10,10 +10,14 @@ export class ConditionalStore<T, U> extends Store<T | U> {
     private elseSubscription: Subscription | undefined = undefined;
 
     public constructor(source: Store<boolean>, sourceIf: Store<T>, sourceElse: Store<U>) {
-        super(ConditionalStore.conditional(source.state, sourceIf.state, sourceElse.state));
+        super();
         this.source = source;
         this.sourceIf = sourceIf;
         this.sourceElse = sourceElse;
+    }
+
+    public get state() {
+        return ConditionalStore.conditional(this.source.state, this.sourceIf.state, this.sourceElse.state);
     }
 
     protected start() {
@@ -45,7 +49,7 @@ export class ConditionalStore<T, U> extends Store<T | U> {
                 this.elseSubscription = undefined;
             }
             if (!this.ifSubscription) {
-                this.handleBranchNext(this.sourceIf.state);
+                this.handleBranchNext();
                 this.ifSubscription = this.sourceIf.subscribe(this.handleBranchNext);
             }
         } else {
@@ -54,14 +58,14 @@ export class ConditionalStore<T, U> extends Store<T | U> {
                 this.ifSubscription = undefined;
             }
             if (!this.elseSubscription) {
-                this.handleBranchNext(this.sourceElse.state);
+                this.handleBranchNext();
                 this.elseSubscription = this.sourceElse.subscribe(this.handleBranchNext);
             }
         }
     }
 
-    private handleBranchNext = (value: T | U) => {
-        this.setInnerState(value);
+    private handleBranchNext = () => {
+        this.notify();
     }
 
     private static conditional<T, U>(state: boolean, stateIf: T, stateElse: U): T | U {

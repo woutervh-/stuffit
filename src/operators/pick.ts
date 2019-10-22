@@ -7,9 +7,13 @@ export class PickStore<T, K extends keyof T> extends Store<{ [Key in K]: T[Key] 
     private subscription: Subscription | undefined = undefined;
 
     public constructor(source: Store<T>, keys: K[]) {
-        super(PickStore.pick(source.state, keys));
+        super();
         this.source = source;
         this.keys = keys;
+    }
+
+    public get state() {
+        return PickStore.pick(this.source.state, this.keys);
     }
 
     protected start() {
@@ -26,7 +30,7 @@ export class PickStore<T, K extends keyof T> extends Store<{ [Key in K]: T[Key] 
     }
 
     private handleNext = () => {
-        this.setInnerState(PickStore.pick(this.source.state, this.keys));
+        this.notify();
     }
 
     private static pick<T, K extends keyof T>(value: T, keys: K[]): { [Key in K]: T[Key] } {

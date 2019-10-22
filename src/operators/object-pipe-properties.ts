@@ -10,18 +10,27 @@ export class ObjectPipePropertiesStore<T extends string, U extends { [Key in T]:
     private targets: { [Key in T]: Store<V[T]> };
     private subscriptions = {} as { [Key in T]: Subscription };
 
-    private constructor(source: Store<U>, transform: (source: Store<U[T]>, key: T) => Store<V[T]>, initialState: V, sources: { [Key in T]: PushStore<U[T]> }, targets: { [Key in T]: Store<V[T]> }) {
-        super(initialState);
+    private constructor(source: Store<U>, transform: (source: Store<U[T]>, key: T) => Store<V[T]>, sources: { [Key in T]: PushStore<U[T]> }, targets: { [Key in T]: Store<V[T]> }) {
+        super();
         this.source = source;
         this.transform = transform;
         this.sources = sources;
         this.targets = targets;
     }
 
+    public get state() {
+        const result = {} as V;
+        for (const key of Object.keys(this.targets)) {
+            result[key as T] = this.targets[key as T].state;
+        }
+        return result;
+    }
+
     protected start() {
         for (const key of Object.keys(this.targets)) {
             this.subscriptions[key as T] = this.targets[key as T].subscribe(this.handleChange);
         }
+        this.handleNext(this.source.state);
         if (this.subscription === undefined) {
             this.subscription = this.source.subscribe(this.handleNext);
         }
@@ -79,24 +88,17 @@ export class ObjectPipePropertiesStore<T extends string, U extends { [Key in T]:
     }
 
     private handleChange = () => {
-        const result = {} as V;
-        for (const key of Object.keys(this.targets)) {
-            result[key as T] = this.targets[key as T].state;
-        }
-        this.setInnerState(result);
+        this.notify();
     }
 
     public static fromSourceAndTransform<T extends string, U extends { [Key in T]: unknown }, V extends { [Key in T]: unknown }>(source: Store<U>, transform: (source: Store<U[T]>, key: T) => Store<V[T]>) {
-        const sourceState = source.state;
         const sources = {} as { [Key in T]: PushStore<U[T]> };
         const targets = {} as { [Key in T]: Store<V[T]> };
-        const targetState = {} as V;
-        for (const key of Object.keys(sourceState)) {
-            sources[key as T] = new PushStore<U[T]>(sourceState[key as T]);
+        for (const key of Object.keys(source.state)) {
+            sources[key as T] = new PushStore<U[T]>(source.state[key as T]);
             targets[key as T] = sources[key as T].pipe((source) => transform(source, key as T));
-            targetState[key as T] = targets[key as T].state;
         }
-        return new ObjectPipePropertiesStore(source, transform, targetState, sources, targets);
+        return new ObjectPipePropertiesStore(source, transform, sources, targets);
     }
 }
 

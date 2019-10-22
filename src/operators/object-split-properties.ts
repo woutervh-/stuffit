@@ -7,8 +7,12 @@ export class ObjectSplitPropertiesStore<T extends {}> extends Store<{ [Key in ke
     private subscription: Subscription | undefined = undefined;
 
     public constructor(source: Store<T>) {
-        super(ObjectSplitPropertiesStore.split(source.state));
+        super();
         this.source = source;
+    }
+
+    public get state() {
+        return ObjectSplitPropertiesStore.split(this.source.state);
     }
 
     protected start() {
@@ -54,7 +58,7 @@ export class ObjectSplitPropertiesStore<T extends {}> extends Store<{ [Key in ke
         }
 
         if (deletedOrAdded) {
-            this.setInnerState(next);
+            this.notify();
         }
     }
 

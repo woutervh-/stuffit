@@ -6,8 +6,12 @@ export class ArrayCombineStore<T extends unknown[]> extends Store<T> {
     private subscriptions: Subscription[] | undefined = undefined;
 
     public constructor(sources: { [K in keyof T]: Store<T[K]> }) {
-        super(ArrayCombineStore.combine<T>(sources));
+        super();
         this.sources = sources;
+    }
+
+    public get state() {
+        return ArrayCombineStore.combine<T>(this.sources);
     }
 
     protected start() {
@@ -30,7 +34,7 @@ export class ArrayCombineStore<T extends unknown[]> extends Store<T> {
     }
 
     private handleNext = () => {
-        this.setInnerState(ArrayCombineStore.combine<T>(this.sources));
+        this.notify();
     }
 
     private static combine<T extends unknown[]>(sources: { [K in keyof T]: Store<T[K]> }) {
