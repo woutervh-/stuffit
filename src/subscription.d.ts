@@ -1,3 +1,5 @@
 export interface Subscription {
-    unsubscribe: () => void;
+    unsubscribe(): void;
+    activate(): void;
+    deactivate(): void;
 }

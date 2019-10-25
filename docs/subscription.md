@@ -4,6 +4,6 @@ A simple interface with a single function that allows the subscriber to stop its
 
 ```typescript
 interface Subscription {
-    unsubscribe: () => void;
+    unsubscribe(): void;
 }
 ```

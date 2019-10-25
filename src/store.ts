@@ -3,7 +3,8 @@ import { Subscription } from './subscription';
 export abstract class Store<T> {
     private innerState: T;
     private listenerCounter: number = 0;
-    private listeners: Map<number, (value: T) => void> = new Map();
+    private activeListeners: Map<number, (value: T) => void> = new Map();
+    private passiveListeners: Map<number, (value: T) => void> = new Map();
 
     public constructor(initialState: T) {
         this.innerState = initialState;
@@ -13,20 +14,50 @@ export abstract class Store<T> {
         return this.innerState;
     }
 
-    public subscribe(listener: (value: T) => void): Subscription {
+    public subscribe(listener: (value: T) => void, passive: boolean = false): Subscription {
         const token = this.listenerCounter++;
-        this.listeners.set(token, listener);
-        if (this.listeners.size === 1) {
-            this.start();
-        }
-        return {
-            unsubscribe: () => {
-                if (this.listeners.size === 1) {
-                    this.stop();
+        const store = this;
+        const subscription: Subscription = {
+            unsubscribe() {
+                if (store.activeListeners.has(token)) {
+                    if (store.activeListeners.size === 1) {
+                        store.stop();
+                    }
+                    store.activeListeners.delete(token);
                 }
-                this.listeners.delete(token);
+                if (store.passiveListeners.has(token)) {
+                    store.passiveListeners.delete(token);
+                }
+            },
+            activate() {
+                if (store.passiveListeners.has(token)) {
+                    store.passiveListeners.delete(token);
+                }
+                if (!store.activeListeners.has(token)) {
+                    store.activeListeners.set(token, listener);
+                    if (store.activeListeners.size === 1) {
+                        store.start();
+                    }
+                }
+            },
+            deactivate() {
+                if (store.activeListeners.has(token)) {
+                    if (store.activeListeners.size === 1) {
+                        store.stop();
+                    }
+                    store.activeListeners.delete(token);
+                }
+                if (!store.passiveListeners.has(token)) {
+                    store.passiveListeners.set(token, listener);
+                }
             }
         };
+        if (passive) {
+            subscription.deactivate();
+        } else {
+            subscription.activate();
+        }
+        return subscription;
     }
 
     public pipe<U>(transform: (source: this) => Store<U>): Store<U> {
@@ -46,7 +77,10 @@ export abstract class Store<T> {
     protected abstract stop(): void;
 
     private notify(value: T) {
-        for (const listener of this.listeners.values()) {
+        for (const listener of this.activeListeners.values()) {
+            listener(value);
+        }
+        for (const listener of this.passiveListeners.values()) {
             listener(value);
         }
     }
