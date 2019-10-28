@@ -10,16 +10,41 @@ beforeEach(() => {
 
 describe('MapOperator', () => {
     describe('#state', () => {
-        it('maps the state using the given project function.', () => {
+        it('Maps the state using the given project function.', () => {
             const store = new MapOperator(source, () => 42);
             chai.assert.strictEqual(store.state, 42);
             source.setState(1);
             chai.assert.strictEqual(store.state, 42);
         });
+
+        it('Passes the source state into the project function.', () => {
+            const store = new MapOperator(source, (input) => input);
+            chai.assert.strictEqual(store.state, 0);
+            source.setState(42);
+            chai.assert.strictEqual(store.state, 42);
+        });
+    });
+
+    describe('#subscribe', () => {
+        it('Notifies subscribers when the underlying source has changed.', () => {
+            let count = 0;
+            const store = new MapOperator(source, () => 42);
+            const subscription = store.subscribe(() => count += 1);
+
+            chai.assert.strictEqual(count, 0);
+            source.setState(1);
+            chai.assert.strictEqual(count, 1);
+            source.setState(2);
+            chai.assert.strictEqual(count, 2);
+            source.setState(2);
+            chai.assert.strictEqual(count, 3);
+
+            subscription.unsubscribe();
+        });
     });
 
     describe('Laziness', () => {
-        it('will only call the project function when the source has new input.', () => {
+        it('Will only call the project function when the source has new input.', () => {
             let count = 0;
             const store = new MapOperator(source, () => (count += 1, 42));
 
@@ -33,7 +58,7 @@ describe('MapOperator', () => {
             chai.assert.strictEqual(count, 2);
         });
 
-        it('will only call the project function when the client requests the state.', () => {
+        it('Will only call the project function when the client requests the state.', () => {
             let count = 0;
             const store = new MapOperator(source, () => (count += 1, 42));
 

@@ -4,10 +4,15 @@ export abstract class Store<T> {
     protected start?: () => void;
     protected stop?: () => void;
 
+    private innerVersion: number = 0;
     private listenerCounter: number = 0;
     private listeners: Map<number, (value: Store<T>) => void> = new Map();
 
     public abstract get state(): T;
+
+    public get version() {
+        return this.innerVersion;
+    }
 
     public subscribe(listener: (value: Store<T>) => void, immediate: boolean = false): Subscription {
         const token = this.listenerCounter++;
@@ -43,7 +48,12 @@ export abstract class Store<T> {
         return this.listeners.size >= 1;
     }
 
-    protected notify() {
+    protected incrementVersion() {
+        this.innerVersion += 1;
+        this.notify();
+    }
+
+    private notify() {
         for (const listener of this.listeners.values()) {
             listener(this);
         }

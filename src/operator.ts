@@ -41,6 +41,6 @@ export abstract class Operator<T> extends Store<T> {
     }
 
     private handleChange = () => {
-        this.notify();
+        this.incrementVersion();
     }
 }

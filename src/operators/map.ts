@@ -3,8 +3,8 @@ import { Operator } from '../operator';
 import { Store } from '../store';
 
 export class MapOperator<T, U> extends Operator<U> {
-    private getState = memoize(<T, U>(state: T, project: (value: T) => U) => {
-        return project(state);
+    private getState = memoize((version: number) => {
+        return this.project(this.source.state);
     });
 
     public constructor(private source: Store<T>, private project: (value: T) => U) {
@@ -13,7 +13,7 @@ export class MapOperator<T, U> extends Operator<U> {
     }
 
     public get state() {
-        return this.getState(this.source.state, this.project);
+        return this.getState(this.source.version);
     }
 }
 
