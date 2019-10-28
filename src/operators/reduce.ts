@@ -12,13 +12,13 @@ export class ReduceStore<T, U> extends Store<U> {
         this.reduce = reduce;
     }
 
-    protected start() {
+    protected start = () => {
         if (this.subscription === undefined) {
             this.subscription = this.source.subscribe(this.handleNext);
         }
     }
 
-    protected stop() {
+    protected stop = () => {
         if (this.subscription !== undefined) {
             this.subscription.unsubscribe();
             this.subscription = undefined;

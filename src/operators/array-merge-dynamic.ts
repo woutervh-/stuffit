@@ -12,13 +12,13 @@ export class ArrayMergeDynamicStore<T extends unknown[]> extends Store<T[number]
         this.source = source;
     }
 
-    protected start() {
+    protected start = () => {
         if (this.subscription === undefined) {
             this.subscription = this.source.subscribe(this.handleSourceNext);
         }
     }
 
-    protected stop() {
+    protected stop = () => {
         if (this.subscription !== undefined) {
             this.subscription.unsubscribe();
             this.subscription = undefined;

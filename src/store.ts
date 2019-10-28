@@ -1,9 +1,13 @@
 import { Subscription } from './subscription';
 
 export abstract class Store<T> {
+    protected start?: () => void;
+    protected stop?: () => void;
+
     private innerState: T;
+    private innerVersion: number = 0;
     private listenerCounter: number = 0;
-    private listeners: Map<number, (value: T) => void> = new Map();
+    private listeners: Map<number, (store: Store<T>) => void> = new Map();
 
     public constructor(initialState: T) {
         this.innerState = initialState;
@@ -13,20 +17,30 @@ export abstract class Store<T> {
         return this.innerState;
     }
 
-    public subscribe(listener: (value: T) => void): Subscription {
+    public get version(): number {
+        return this.innerVersion;
+    }
+
+    public subscribe(listener: (store: Store<T>) => void, immediate: boolean = false): Subscription {
         const token = this.listenerCounter++;
         this.listeners.set(token, listener);
-        if (this.listeners.size === 1) {
+        if (this.start && this.listeners.size === 1) {
             this.start();
         }
-        return {
-            unsubscribe: () => {
-                if (this.listeners.size === 1) {
-                    this.stop();
+        const subscription = {
+            store: this,
+            token,
+            unsubscribe() {
+                if (this.store.stop && this.store.listeners.size === 1) {
+                    this.store.stop();
                 }
-                this.listeners.delete(token);
+                this.store.listeners.delete(this.token);
             }
         };
+        if (immediate) {
+            listener(this);
+        }
+        return subscription;
     }
 
     public pipe<U>(transform: (source: this) => Store<U>): Store<U> {
@@ -38,16 +52,14 @@ export abstract class Store<T> {
     }
 
     protected setInnerState(state: T) {
+        this.innerVersion += 1;
         this.innerState = state;
-        this.notify(state);
+        this.notify();
     }
 
-    protected abstract start(): void;
-    protected abstract stop(): void;
-
-    private notify(value: T) {
+    private notify() {
         for (const listener of this.listeners.values()) {
-            listener(value);
+            listener(this);
         }
     }
 }

@@ -7,14 +7,6 @@ export class PromiseStore<T> extends Store<PromiseResult<T>> {
         promise.then(this.handlePromiseResult).catch(this.handlePromiseError);
     }
 
-    protected start() {
-        //
-    }
-
-    protected stop() {
-        //
-    }
-
     private handlePromiseResult = (result: T) => {
         const fulfilled = createFulfilled(result);
         this.setInnerState(fulfilled);

@@ -12,13 +12,13 @@ export class DistinctStore<T> extends Store<T> {
         this.testEquality = testEquality;
     }
 
-    protected start() {
+    protected start = () => {
         if (this.subscription === undefined) {
             this.subscription = this.source.subscribe(this.handleNext);
         }
     }
 
-    protected stop() {
+    protected stop = () => {
         if (this.subscription !== undefined) {
             this.subscription.unsubscribe();
             this.subscription = undefined;

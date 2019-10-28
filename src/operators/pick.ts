@@ -12,13 +12,13 @@ export class PickStore<T, K extends keyof T> extends Store<{ [Key in K]: T[Key] 
         this.keys = keys;
     }
 
-    protected start() {
+    protected start = () => {
         if (this.subscription === undefined) {
             this.subscription = this.source.subscribe(this.handleNext);
         }
     }
 
-    protected stop() {
+    protected stop = () => {
         if (this.subscription !== undefined) {
             this.subscription.unsubscribe();
             this.subscription = undefined;

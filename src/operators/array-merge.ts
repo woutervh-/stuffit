@@ -10,11 +10,11 @@ export class ArrayMergeStore<T extends unknown[]> extends Store<T[number]> {
         this.sources = sources;
     }
 
-    protected start() {
+    protected start = () => {
         this.subscriptions = this.sources.map(this.subscribeTo);
     }
 
-    protected stop() {
+    protected stop = () => {
         for (const subscription of this.subscriptions) {
             subscription.unsubscribe();
         }

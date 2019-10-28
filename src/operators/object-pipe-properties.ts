@@ -18,7 +18,7 @@ export class ObjectPipePropertiesStore<T extends string, U extends { [Key in T]:
         this.targets = targets;
     }
 
-    protected start() {
+    protected start = () => {
         for (const key of Object.keys(this.targets)) {
             this.subscriptions[key as T] = this.targets[key as T].subscribe(this.handleChange);
         }
@@ -27,7 +27,7 @@ export class ObjectPipePropertiesStore<T extends string, U extends { [Key in T]:
         }
     }
 
-    protected stop() {
+    protected stop = () => {
         if (this.subscription !== undefined) {
             this.subscription.unsubscribe();
             this.subscription = undefined;

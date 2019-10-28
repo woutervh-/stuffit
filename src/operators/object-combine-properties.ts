@@ -12,7 +12,7 @@ export class ObjectCombinePropertiesStore<T extends {}> extends Store<T> {
         this.source = source;
     }
 
-    protected start() {
+    protected start = () => {
         for (const key of Object.keys(this.source.state)) {
             this.sources[key as keyof T] = this.source.state[key as keyof T] as Store<T[keyof T]>;
             this.subscriptions[key as keyof T] = this.source.state[key as keyof T].subscribe(this.handleChange);
@@ -22,7 +22,7 @@ export class ObjectCombinePropertiesStore<T extends {}> extends Store<T> {
         }
     }
 
-    protected stop() {
+    protected stop = () => {
         if (this.subscription !== undefined) {
             this.subscription.unsubscribe();
             this.subscription = undefined;

@@ -1,35 +1,17 @@
+import { Operator } from '../operator';
 import { Store } from '../store';
-import { Subscription } from '../subscription';
 
-export class MapStore<T, U> extends Store<U> {
-    private source: Store<T>;
-    private project: (value: T) => U;
-    private subscription: Subscription | undefined = undefined;
-
-    public constructor(source: Store<T>, project: (value: T) => U) {
+export class MapOperator<T, U> extends Operator<U> {
+    public constructor(private source: Store<T>, private project: (value: T) => U) {
         super(project(source.state));
-        this.source = source;
-        this.project = project;
+        this.dependencies.addDependency(source, this.update);
     }
 
-    protected start() {
-        if (this.subscription === undefined) {
-            this.subscription = this.source.subscribe(this.handleNext);
-        }
-    }
-
-    protected stop() {
-        if (this.subscription !== undefined) {
-            this.subscription.unsubscribe();
-            this.subscription = undefined;
-        }
-    }
-
-    private handleNext = () => {
+    private update = () => {
         this.setInnerState(this.project(this.source.state));
     }
 }
 
-export const map = <T, U>(project: (value: T) => U) => (source: Store<T>): MapStore<T, U> => {
-    return new MapStore(source, project);
+export const map = <T, U>(project: (value: T) => U) => (source: Store<T>): MapOperator<T, U> => {
+    return new MapOperator(source, project);
 };
