@@ -1,35 +1,25 @@
+import { memoize } from '../memoize';
+import { Operator } from '../operator';
 import { Store } from '../store';
-import { Subscription } from '../subscription';
 
-export class ReduceStore<T, U> extends Store<U> {
-    private source: Store<T>;
-    private subscription: Subscription | undefined = undefined;
-    private reduce: (accumulator: U, currentValue: T) => U;
+export class ReduceOperator<T, U> extends Operator<U> {
+    private currentState: U;
+    private getState = memoize((version: number) => {
+        return this.reduce(this.currentState, this.source.state);
+    });
 
-    constructor(source: Store<T>, reduce: (accumulator: U, currentValue: T) => U, initialValue: U) {
-        super(reduce(initialValue, source.state));
-        this.source = source;
-        this.reduce = reduce;
+    constructor(private source: Store<T>, private reduce: (accumulator: U, currentValue: T) => U, initialValue: U) {
+        super();
+        this.addDependency(source);
+        this.currentState = initialValue;
     }
 
-    protected start() {
-        if (this.subscription === undefined) {
-            this.subscription = this.source.subscribe(this.handleNext);
-        }
-    }
-
-    protected stop() {
-        if (this.subscription !== undefined) {
-            this.subscription.unsubscribe();
-            this.subscription = undefined;
-        }
-    }
-
-    private handleNext = (value: T) => {
-        this.setInnerState(this.reduce(this.state, value));
+    public get state() {
+        this.currentState = this.getState(this.source.version);
+        return this.currentState;
     }
 }
 
-export const reduce = <T, U>(reduce: (accumulator: U, currentValue: T) => U, initialValue: U) => (source: Store<T>): ReduceStore<T, U> => {
-    return new ReduceStore(source, reduce, initialValue);
+export const reduce = <T, U>(reduce: (accumulator: U, currentValue: T) => U, initialValue: U) => (source: Store<T>): ReduceOperator<T, U> => {
+    return new ReduceOperator(source, reduce, initialValue);
 };
