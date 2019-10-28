@@ -5,11 +5,11 @@ export abstract class Store<T> {
     protected stop?: () => void;
 
     private listenerCounter: number = 0;
-    private listeners: Map<number, (value: this) => void> = new Map();
+    private listeners: Map<number, (value: Store<T>) => void> = new Map();
 
     public abstract get state(): T;
 
-    public subscribe(listener: (value: this) => void, immediate: boolean = false): Subscription {
+    public subscribe(listener: (value: Store<T>) => void, immediate: boolean = false): Subscription {
         const token = this.listenerCounter++;
         this.listeners.set(token, listener);
         if (this.start && this.listeners.size === 1) {
@@ -37,6 +37,10 @@ export abstract class Store<T> {
 
     public compose<U>(transform: (source: this) => U): U {
         return transform(this);
+    }
+
+    public hasStarted() {
+        return this.listeners.size >= 1;
     }
 
     protected notify() {

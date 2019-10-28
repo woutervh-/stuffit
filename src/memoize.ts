@@ -10,7 +10,7 @@ const equals = (left: unknown[], right: unknown[]) => {
     return true;
 };
 
-export const memoize = <T extends (...args: unknown[]) => unknown>(fn: T): T => {
+export const memoize = <T extends Function>(fn: T): T => {
     let lastValues: { args: unknown[], returnValue: unknown } | null = null;
 
     return function (this: unknown, ...args: unknown[]) {
@@ -21,5 +21,5 @@ export const memoize = <T extends (...args: unknown[]) => unknown>(fn: T): T => 
             lastValues = { args, returnValue };
             return returnValue;
         }
-    } as T;
+    } as unknown as T;
 };

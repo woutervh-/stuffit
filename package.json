@@ -8,7 +8,7 @@
   "scripts": {
     "lint": "tslint \"src/**/*.ts\" \"test/**/*.ts\"",
     "build": "rimraf lib/ && tsc && copy-cli \"src/**/*.d.ts\" \"lib/es6/\"",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha \"test/**/*.test.ts\""
   },
   "files": [
     "lib/"
@@ -24,8 +24,13 @@
   },
   "homepage": "https://github.com/woutervh-/stuffit#readme",
   "devDependencies": {
+    "@types/chai": "^4.2.4",
+    "@types/mocha": "^5.2.7",
+    "chai": "^4.2.0",
     "copy": "^0.3.2",
+    "mocha": "^6.2.2",
     "rimraf": "^2.6.3",
+    "ts-node": "^8.4.1",
     "tslint": "^5.18.0",
     "typescript": "^3.5.3"
   },
