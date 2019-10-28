@@ -5,13 +5,14 @@ export class IntervalStore extends Store<number> {
     private timeout: number;
 
     public constructor(timeout: number) {
-        super(0);
+        super();
+        this.setInnerState(0);
         this.timeout = timeout;
     }
 
     protected start = () => {
         if (this.timer === undefined) {
-            this.timer = setInterval(this.handleInterval, this.timeout);
+            this.timer = setInterval(this.handleInterval, this.timeout) as unknown as number;
         }
     }
 
@@ -24,6 +25,7 @@ export class IntervalStore extends Store<number> {
 
     private handleInterval = () => {
         this.setInnerState(this.state + 1);
+        this.notify();
     }
 }
 

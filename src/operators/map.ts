@@ -3,11 +3,11 @@ import { Store } from '../store';
 
 export class MapOperator<T, U> extends Operator<U> {
     public constructor(private source: Store<T>, private project: (value: T) => U) {
-        super(project(source.state));
-        this.dependencies.addDependency(source, this.update);
+        super();
+        this.addDependency(source, this.update);
     }
 
-    private update = () => {
+    protected update = () => {
         this.setInnerState(this.project(this.source.state));
     }
 }

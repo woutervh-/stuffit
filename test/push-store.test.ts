@@ -21,4 +21,18 @@ describe('PushStore', () => {
             assert.deepStrictEqual(store.state, 2);
         });
     });
+
+    describe('#subscribe', () => {
+        it('Notifies the subscribers of newly pushed state.', () => {
+            store = new PushStore(0);
+
+            let count = 0;
+            const subscription = store.subscribe(() => count += 1);
+            store.setState(1);
+            assert.deepStrictEqual(count, 1);
+            store.setState(2);
+            assert.deepStrictEqual(count, 2);
+            subscription.unsubscribe();
+        });
+    });
 });

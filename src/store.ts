@@ -3,18 +3,21 @@ import { Subscription } from './subscription';
 export abstract class Store<T> {
     protected start?: () => void;
     protected stop?: () => void;
+    protected initialize?: () => void;
 
-    private innerState: T;
+    private innerState: { value: T } | null = null;
     private innerVersion: number = 0;
     private listenerCounter: number = 0;
     private listeners: Map<number, (store: Store<T>) => void> = new Map();
 
-    public constructor(initialState: T) {
-        this.innerState = initialState;
-    }
-
     public get state(): T {
-        return this.innerState;
+        if (this.innerState === null) {
+            if (!this.initialize) {
+                throw new Error('State has not been initialized and there is no update method to call.');
+            }
+            this.initialize();
+        }
+        return this.innerState!.value;
     }
 
     public get version(): number {
@@ -51,13 +54,16 @@ export abstract class Store<T> {
         return transform(this);
     }
 
-    protected setInnerState(state: T) {
-        this.innerVersion += 1;
-        this.innerState = state;
-        this.notify();
+    public hasStarted() {
+        return this.listeners.size >= 1;
     }
 
-    private notify() {
+    protected setInnerState(state: T) {
+        this.innerVersion += 1;
+        this.innerState = { value: state };
+    }
+
+    protected notify() {
         for (const listener of this.listeners.values()) {
             listener(this);
         }
