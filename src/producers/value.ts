@@ -1,12 +1,12 @@
 import { Store } from '../store';
 
 export class ValueStore<T> extends Store<T> {
-    protected start() {
-        //
+    public constructor(private initialState: T) {
+        super();
     }
 
-    protected stop() {
-        //
+    public get state() {
+        return this.initialState;
     }
 }
 

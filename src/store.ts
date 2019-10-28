@@ -1,32 +1,34 @@
 import { Subscription } from './subscription';
 
 export abstract class Store<T> {
-    private innerState: T;
+    protected start?: () => void;
+    protected stop?: () => void;
+
     private listenerCounter: number = 0;
-    private listeners: Map<number, (value: T) => void> = new Map();
+    private listeners: Map<number, (value: this) => void> = new Map();
 
-    public constructor(initialState: T) {
-        this.innerState = initialState;
-    }
+    public abstract get state(): T;
 
-    public get state(): T {
-        return this.innerState;
-    }
-
-    public subscribe(listener: (value: T) => void): Subscription {
+    public subscribe(listener: (value: this) => void, immediate: boolean = false): Subscription {
         const token = this.listenerCounter++;
         this.listeners.set(token, listener);
-        if (this.listeners.size === 1) {
+        if (this.start && this.listeners.size === 1) {
             this.start();
         }
-        return {
-            unsubscribe: () => {
-                if (this.listeners.size === 1) {
-                    this.stop();
+        const subscription = {
+            store: this,
+            token,
+            unsubscribe() {
+                if (this.store.stop && this.store.listeners.size === 1) {
+                    this.store.stop();
                 }
-                this.listeners.delete(token);
+                this.store.listeners.delete(this.token);
             }
         };
+        if (immediate) {
+            listener(this);
+        }
+        return subscription;
     }
 
     public pipe<U>(transform: (source: this) => Store<U>): Store<U> {
@@ -37,17 +39,9 @@ export abstract class Store<T> {
         return transform(this);
     }
 
-    protected setInnerState(state: T) {
-        this.innerState = state;
-        this.notify(state);
-    }
-
-    protected abstract start(): void;
-    protected abstract stop(): void;
-
-    private notify(value: T) {
+    protected notify() {
         for (const listener of this.listeners.values()) {
-            listener(value);
+            listener(this);
         }
     }
 }
