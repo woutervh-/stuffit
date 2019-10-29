@@ -15,7 +15,7 @@ afterEach(() => {
     clock.restore();
 });
 
-describe('throttle', () => {
+describe('ThrottleOperator', () => {
     describe('#state', () => {
         it('Always has an updated state, despite the source updating more frequently than the throttle timeout.', () => {
             const store = new ThrottleOperator(source, 100);

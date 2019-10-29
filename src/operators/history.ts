@@ -1,33 +1,31 @@
+import { Memoize } from '../memoize';
+import { Operator } from '../operator';
 import { Store } from '../store';
-import { Subscription } from '../subscription';
 
-export class HistoryStore<T> extends Store<(T | undefined)[]> {
-    private source: Store<T>;
-    private subscription: Subscription | undefined = undefined;
-
-    public constructor(source: Store<T>, frames: number) {
-        super(HistoryStore.emptyHistory(frames));
-        this.source = source;
-    }
-
-    protected start() {
-        if (this.subscription === undefined) {
-            this.subscription = this.source.subscribe(this.handleNext);
-        }
-    }
-
-    protected stop() {
-        if (this.subscription !== undefined) {
-            this.subscription.unsubscribe();
-            this.subscription = undefined;
-        }
-    }
-
-    private handleNext = (value: T) => {
-        const history = this.state.slice();
+export class HistoryOperator<T> extends Operator<(T | undefined)[]> {
+    private getState = Memoize.one((version: number) => {
+        const history = this.history.slice();
         history.shift();
-        history.push(value);
-        this.setInnerState(history);
+        history.push(this.source.state);
+        return history;
+    });
+
+    private history: (T | undefined)[];
+
+    public constructor(private source: Store<T>, frames: number) {
+        super();
+        this.history = HistoryOperator.emptyHistory(frames);
+        this.addDependency(source);
+    }
+
+    public get state() {
+        this.history = this.getState(this.source.version);
+        return this.history;
+    }
+
+    protected handleChange() {
+        this.incrementVersion();
+        this.notify();
     }
 
     private static emptyHistory(frames: number) {
@@ -39,6 +37,6 @@ export class HistoryStore<T> extends Store<(T | undefined)[]> {
     }
 }
 
-export const history = (frames: number) => <T>(source: Store<T>): HistoryStore<T> => {
-    return new HistoryStore(source, frames);
+export const history = (frames: number) => <T>(source: Store<T>): HistoryOperator<T> => {
+    return new HistoryOperator(source, frames);
 };

@@ -1,21 +1,23 @@
-import { MaterializedStore } from '../materialized-store';
+import { Store } from '../store';
 
-export class IntervalStore extends MaterializedStore<number> {
+export class IntervalStore extends Store<number> {
     private timer: number | undefined = undefined;
-    private timeout: number;
 
-    public constructor(timeout: number) {
-        super(0);
-        this.timeout = timeout;
+    public constructor(private timeout: number) {
+        super();
     }
 
-    protected start = () => {
+    public get state() {
+        return this.version;
+    }
+
+    protected start() {
         if (this.timer === undefined) {
             this.timer = setInterval(this.handleInterval, this.timeout);
         }
     }
 
-    protected stop = () => {
+    protected stop() {
         if (this.timer !== undefined) {
             clearInterval(this.timer);
             this.timer = undefined;
@@ -23,7 +25,8 @@ export class IntervalStore extends MaterializedStore<number> {
     }
 
     private handleInterval = () => {
-        this.setState(this.state + 1);
+        this.incrementVersion();
+        this.notify();
     }
 }
 

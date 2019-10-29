@@ -8,6 +8,14 @@ export class ValueStore<T> extends Store<T> {
     public get state() {
         return this.initialState;
     }
+
+    protected start() {
+        //
+    }
+
+    protected stop() {
+        //
+    }
 }
 
 export const fromValue = <T>(initialState: T): ValueStore<T> => {

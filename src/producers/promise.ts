@@ -1,22 +1,39 @@
 import { createFulfilled, createRejected, pending, PromiseResult } from 'promise-result';
-import { MaterializedStore } from '../materialized-store';
+import { Store } from '../store';
 
-export class PromiseStore<T> extends MaterializedStore<PromiseResult<T>> {
+export class PromiseStore<T> extends Store<PromiseResult<T>> {
+    private result: PromiseResult<T> = pending;
+
     public constructor(promise: Promise<T>) {
-        super(pending);
+        super();
         promise.then(this.handlePromiseResult).catch(this.handlePromiseError);
     }
 
+    public get state() {
+        return this.result;
+    }
+
+    protected start() {
+        //
+    }
+
+    protected stop() {
+        //
+    }
+
     private handlePromiseResult = (result: T) => {
-        const fulfilled = createFulfilled(result);
-        this.setState(fulfilled);
+        this.result = createFulfilled(result);
+        this.incrementVersion();
+        this.notify();
     }
 
     private handlePromiseError = (error: unknown) => {
         const rejected = error instanceof Error
             ? createRejected(error)
             : createRejected(new Error('Promise was rejected.'));
-        this.setState(rejected);
+        this.result = rejected;
+        this.incrementVersion();
+        this.notify();
     }
 }
 
