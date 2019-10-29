@@ -18,6 +18,11 @@ export class ReduceOperator<T, U> extends Operator<U> {
         this.currentState = this.getState(this.source.version);
         return this.currentState;
     }
+
+    protected handleChange() {
+        this.incrementVersion();
+        this.notify();
+    }
 }
 
 export const reduce = <T, U>(reduce: (accumulator: U, currentValue: T) => U, initialValue: U) => (source: Store<T>): ReduceOperator<T, U> => {

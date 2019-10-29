@@ -1,64 +1,68 @@
+import { Operator } from '../operator';
 import { Store } from '../store';
-import { Subscription } from '../subscription';
 
-export class ThrottleStore<T> extends Store<T> {
-    private source: Store<T>;
-    private limit: number | 'raf';
-    private subscription: Subscription | undefined = undefined;
-    private throttledState: { value: T } | undefined = undefined;
-    private throttleTimeout: number | undefined = undefined;
+export class ThrottleOperator<T> extends Operator<T> {
+    private throttleTimeout: number | null = null;
+    private lastThrottleVersion: number | null = null;
 
-    public constructor(source: Store<T>, limit: number | 'raf') {
-        super(source.state);
-        this.source = source;
-        this.limit = limit;
+    public constructor(private source: Store<T>, private limit: number | 'raf') {
+        super();
+        this.addDependency(source);
     }
 
-    protected start() {
-        if (this.subscription === undefined) {
-            this.subscription = this.source.subscribe(this.handleNext);
+    public get state() {
+        return this.source.state;
+    }
+
+    protected handleChange() {
+        this.incrementVersion();
+
+        if (this.throttleTimeout === null) {
+            this.setTimeout();
+            this.notify();
         }
     }
 
     protected stop() {
-        if (this.subscription !== undefined) {
-            this.subscription.unsubscribe();
-            this.subscription = undefined;
+        super.stop();
+        if (this.throttleTimeout !== null) {
+            this.clearTimeout();
         }
-        if (this.throttleTimeout !== undefined) {
-            if (typeof this.limit === 'number') {
-                clearTimeout(this.throttleTimeout);
-            } else {
-                cancelAnimationFrame(this.throttleTimeout);
-            }
-            this.throttleTimeout = undefined;
-        }
-        this.throttledState = undefined;
     }
 
     private handleThrottledCallback = () => {
-        this.throttleTimeout = undefined;
-        if (this.throttledState) {
-            this.setInnerState(this.throttledState.value);
-            this.throttledState = undefined;
+        this.throttleTimeout = null;
+        if (this.lastThrottleVersion !== this.source.version) {
+            this.setTimeout();
+            this.notify();
         }
     }
 
-    private handleNext = (value: T) => {
-        if (this.throttleTimeout === undefined) {
-            this.setInnerState(value);
-
-            if (typeof this.limit === 'number') {
-                this.throttleTimeout = setTimeout(this.handleThrottledCallback, this.limit);
-            } else {
-                this.throttleTimeout = requestAnimationFrame(this.handleThrottledCallback);
-            }
-        } else {
-            this.throttledState = { value };
+    private setTimeout() {
+        if (this.throttleTimeout !== null) {
+            return;
         }
+        this.lastThrottleVersion = this.source.version;
+        if (this.limit === 'raf') {
+            this.throttleTimeout = requestAnimationFrame(this.handleThrottledCallback);
+        } else {
+            this.throttleTimeout = setTimeout(this.handleThrottledCallback, this.limit);
+        }
+    }
+
+    private clearTimeout() {
+        if (this.throttleTimeout === null) {
+            return;
+        }
+        if (this.limit === 'raf') {
+            cancelAnimationFrame(this.throttleTimeout);
+        } else {
+            clearTimeout(this.throttleTimeout);
+        }
+        this.throttleTimeout = null;
     }
 }
 
-export const throttle = (limit: number | 'raf') => <T>(source: Store<T>): ThrottleStore<T> => {
-    return new ThrottleStore(source, limit);
+export const throttle = (limit: number | 'raf') => <T>(source: Store<T>): ThrottleOperator<T> => {
+    return new ThrottleOperator(source, limit);
 };

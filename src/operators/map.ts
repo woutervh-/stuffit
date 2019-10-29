@@ -15,6 +15,11 @@ export class MapOperator<T, U> extends Operator<U> {
     public get state() {
         return this.getState(this.source.version);
     }
+
+    protected handleChange() {
+        this.incrementVersion();
+        this.notify();
+    }
 }
 
 export const map = <T, U>(project: (value: T) => U) => (source: Store<T>): MapOperator<T, U> => {

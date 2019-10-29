@@ -8,12 +8,14 @@ interface Dependency {
 export abstract class Operator<T> extends Store<T> {
     private dependencies: Map<Store<unknown>, Dependency> = new Map();
 
+    protected abstract handleChange(): void;
+
     protected addDependency<T>(source: Store<T>) {
         if (this.dependencies.has(source as Store<unknown>)) {
             throw new Error('Dependency already exists.');
         }
         const subscription = this.hasStarted()
-            ? source.subscribe(this.handleChange)
+            ? source.subscribe(this.handleChangeProxy)
             : null;
         this.dependencies.set(source as Store<unknown>, { subscription });
     }
@@ -28,19 +30,17 @@ export abstract class Operator<T> extends Store<T> {
         this.dependencies.delete(source);
     }
 
-    protected start = () => {
+    protected start() {
         for (const [store, dependency] of this.dependencies.entries()) {
-            dependency.subscription = store.subscribe(this.handleChange);
+            dependency.subscription = store.subscribe(this.handleChangeProxy);
         }
     }
 
-    protected stop = () => {
+    protected stop() {
         for (const dependency of this.dependencies.values()) {
             dependency.subscription!.unsubscribe();
         }
     }
 
-    private handleChange = () => {
-        this.incrementVersion();
-    }
+    private handleChangeProxy = () => this.handleChange();
 }

@@ -1,8 +1,6 @@
 import { Subscription } from './subscription';
 
 export abstract class Store<T> {
-    protected start?: () => void;
-    protected stop?: () => void;
 
     private innerVersion: number = 0;
     private listenerCounter: number = 0;
@@ -50,10 +48,12 @@ export abstract class Store<T> {
 
     protected incrementVersion() {
         this.innerVersion += 1;
-        this.notify();
     }
 
-    private notify() {
+    protected abstract start(): void;
+    protected abstract stop(): void;
+
+    protected notify() {
         for (const listener of this.listeners.values()) {
             listener(this);
         }

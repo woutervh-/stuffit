@@ -15,5 +15,14 @@ export class MaterializedStore<T> extends Store<T> {
     protected setState(newState: T) {
         this.innerState = newState;
         this.incrementVersion();
+        this.notify();
+    }
+
+    protected start() {
+        //
+    }
+
+    protected stop() {
+        //
     }
 }
