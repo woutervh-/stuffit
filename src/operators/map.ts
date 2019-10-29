@@ -1,9 +1,9 @@
-import { memoize } from '../memoize';
+import { Memoize } from '../memoize';
 import { Operator } from '../operator';
 import { Store } from '../store';
 
 export class MapOperator<T, U> extends Operator<U> {
-    private getState = memoize((version: number) => {
+    private getState = Memoize.one((version: number) => {
         return this.project(this.source.state);
     });
 
