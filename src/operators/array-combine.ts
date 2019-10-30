@@ -1,36 +1,24 @@
+import { Dependency } from '../dependency';
 import { Store } from '../store';
-import { Subscription } from '../subscription';
 
 export class ArrayCombineStore<T extends unknown[]> extends Store<T> {
-    private sources: { [K in keyof T]: Store<T[K]> };
-    private subscriptions: Subscription[] | undefined = undefined;
+    private dependencies: Dependency<T[number]>[];
 
-    public constructor(sources: { [K in keyof T]: Store<T[K]> }) {
+    public constructor(private sources: { [K in keyof T]: Store<T[K]> }) {
         super(ArrayCombineStore.combine<T>(sources));
-        this.sources = sources;
+        this.dependencies = sources.map((source) => new Dependency(source, this.handleNext));
     }
 
     protected preStart() {
-        //
+        Dependency.updateAll(this.dependencies);
     }
 
     protected start() {
-        if (this.subscriptions === undefined) {
-            this.subscriptions = this.sources.map(this.subscribeTo);
-        }
+        Dependency.startAll(this.dependencies);
     }
 
     protected stop() {
-        if (this.subscriptions !== undefined) {
-            for (const subscription of this.subscriptions) {
-                subscription.unsubscribe();
-            }
-            this.subscriptions = undefined;
-        }
-    }
-
-    private subscribeTo = (source: Store<unknown>) => {
-        return source.subscribe(this.handleNext);
+        Dependency.stopAll(this.dependencies);
     }
 
     private handleNext = () => {
