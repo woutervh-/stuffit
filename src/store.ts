@@ -1,19 +1,24 @@
 import { Subscription } from './subscription';
 
 export abstract class Store<T> {
+    private innerVersion: number = 0;
     private innerState: T;
     private listenerCounter: number = 0;
-    private listeners: Map<number, (value: T) => void> = new Map();
+    private listeners: Map<number, (state: T) => void> = new Map();
 
     public constructor(initialState: T) {
         this.innerState = initialState;
+    }
+
+    public get version(): number {
+        return this.innerVersion;
     }
 
     public get state(): T {
         return this.innerState;
     }
 
-    public subscribe(listener: (value: T) => void, immediate?: boolean): Subscription {
+    public subscribe(listener: (state: T) => void, immediate?: boolean): Subscription {
         const token = this.listenerCounter++;
         this.listeners.set(token, listener);
         if (this.listeners.size === 1) {
@@ -44,6 +49,7 @@ export abstract class Store<T> {
     }
 
     protected setInnerState(state: T) {
+        this.innerVersion += 1;
         this.innerState = state;
         this.notify(state);
     }
@@ -51,9 +57,9 @@ export abstract class Store<T> {
     protected abstract start(): void;
     protected abstract stop(): void;
 
-    private notify(value: T) {
+    private notify(state: T) {
         for (const listener of this.listeners.values()) {
-            listener(value);
+            listener(state);
         }
     }
 }

@@ -45,6 +45,8 @@ export class ThrottleStore<T> extends Store<T> {
     }
 
     private handleNext = (value: T) => {
+        // TODO: fix bug where after the timeout emits a new value, any value arriving will immediately emit another.
+
         if (this.throttleTimeout === undefined) {
             this.setInnerState(value);
 
