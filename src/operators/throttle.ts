@@ -1,34 +1,26 @@
+import { Dependency } from '../dependency';
 import { Store } from '../store';
-import { Subscription } from '../subscription';
 
 export class ThrottleStore<T> extends Store<T> {
-    private source: Store<T>;
-    private limit: number | 'raf';
-    private subscription: Subscription | undefined = undefined;
+    private dependency: Dependency<T>;
     private throttledState: { value: T } | undefined = undefined;
     private throttleTimeout: number | undefined = undefined;
 
-    public constructor(source: Store<T>, limit: number | 'raf') {
+    public constructor(source: Store<T>, private limit: number | 'raf') {
         super(source.state);
-        this.source = source;
-        this.limit = limit;
+        this.dependency = new Dependency(source, this.handleNext);
     }
 
     protected preStart() {
-        //
+        this.dependency.update();
     }
 
     protected start() {
-        if (this.subscription === undefined) {
-            this.subscription = this.source.subscribe(this.handleNext);
-        }
+        this.dependency.start();
     }
 
     protected stop() {
-        if (this.subscription !== undefined) {
-            this.subscription.unsubscribe();
-            this.subscription = undefined;
-        }
+        this.dependency.stop();
         this.clearTimeout();
         this.throttledState = undefined;
     }
