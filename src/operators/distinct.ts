@@ -1,32 +1,24 @@
+import { Dependency } from '../dependency';
 import { Store } from '../store';
-import { Subscription } from '../subscription';
 
 export class DistinctStore<T> extends Store<T> {
-    private source: Store<T>;
-    private testEquality: (previous: T, next: T) => boolean;
-    private subscription: Subscription | undefined = undefined;
+    private dependency: Dependency<T>;
 
-    public constructor(source: Store<T>, testEquality: (previous: T, next: T) => boolean) {
+    public constructor(source: Store<T>, private testEquality: (previous: T, next: T) => boolean) {
         super(source.state);
-        this.source = source;
-        this.testEquality = testEquality;
+        this.dependency = new Dependency(source, this.handleNext);
     }
 
     protected preStart() {
-        //
+        this.dependency.update();
     }
 
     protected start() {
-        if (this.subscription === undefined) {
-            this.subscription = this.source.subscribe(this.handleNext);
-        }
+        this.dependency.start();
     }
 
     protected stop() {
-        if (this.subscription !== undefined) {
-            this.subscription.unsubscribe();
-            this.subscription = undefined;
-        }
+        this.dependency.stop();
     }
 
     private handleNext = (value: T) => {

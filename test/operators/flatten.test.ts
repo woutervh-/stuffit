@@ -16,7 +16,7 @@ describe('FlattenStore', () => {
     describe('#state', () => {
         it('Flattens the source to emit the inner source values.', () => {
             const store = new FlattenStore(outerSource);
-            const subscription = store.subscribe(() => { /**/ });
+            const subscription = store.subscribe();
 
             chai.assert.strictEqual(store.state, 0);
             innerSource.setState(1);
@@ -29,7 +29,7 @@ describe('FlattenStore', () => {
 
         it('Switches the inner source when the outer source is updated, only emitting values from the new inner source.', () => {
             const store = new FlattenStore(outerSource);
-            const subscription = store.subscribe(() => { /**/ });
+            const subscription = store.subscribe();
 
             innerSource.setState(1);
             chai.assert.strictEqual(store.state, 1);
@@ -57,13 +57,13 @@ describe('FlattenStore', () => {
             innerSource.setState(2);
             chai.assert.strictEqual(store.state, 0);
 
-            subscription = store.subscribe(() => { /**/ });
+            subscription = store.subscribe();
             chai.assert.strictEqual(store.state, 2);
             subscription.unsubscribe();
 
             outerSource.setState(new PushStore(3));
             chai.assert.strictEqual(store.state, 2);
-            subscription = store.subscribe(() => { /**/ });
+            subscription = store.subscribe();
             chai.assert.strictEqual(store.state, 3);
             subscription.unsubscribe();
         });

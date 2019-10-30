@@ -12,7 +12,7 @@ describe('ReduceStore', () => {
     describe('#state', () => {
         it('Reduces over the source states starting with the initial state.', () => {
             const store = new ReduceStore(source, (sum, value) => sum + value, 0);
-            const subscription = store.subscribe(() => { /**/ });
+            const subscription = store.subscribe();
             chai.assert.strictEqual(store.state, 1);
             source.setState(2);
             chai.assert.strictEqual(store.state, 3);

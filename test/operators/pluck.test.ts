@@ -12,7 +12,7 @@ describe('PluckStore', () => {
     describe('#state', () => {
         it('Plucks the input object on the given key', () => {
             const store = new PluckStore(source, 'x');
-            const subscription = store.subscribe(() => { /**/ });
+            const subscription = store.subscribe();
 
             chai.assert.strictEqual(store.state, 0);
             source.setState({ x: 1 });
@@ -32,7 +32,7 @@ describe('PluckStore', () => {
             source.setState({ x: 1 });
             chai.assert.strictEqual(store.state, 0);
 
-            const subscription = store.subscribe(() => { /**/ });
+            const subscription = store.subscribe();
             chai.assert.strictEqual(store.state, 1);
 
             subscription.unsubscribe();

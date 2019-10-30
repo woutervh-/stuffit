@@ -12,7 +12,7 @@ describe('MapStore', () => {
     describe('#state', () => {
         it('Maps the state using the given project function.', () => {
             const store = new MapStore(source, () => 42);
-            const subscription = store.subscribe(() => { /**/ });
+            const subscription = store.subscribe();
             chai.assert.strictEqual(store.state, 42);
             source.setState(1);
             chai.assert.strictEqual(store.state, 42);
@@ -21,7 +21,7 @@ describe('MapStore', () => {
 
         it('Passes the source state into the project function.', () => {
             const store = new MapStore(source, (input) => input);
-            const subscription = store.subscribe(() => { /**/ });
+            const subscription = store.subscribe();
             chai.assert.strictEqual(store.state, 0);
             source.setState(42);
             chai.assert.strictEqual(store.state, 42);

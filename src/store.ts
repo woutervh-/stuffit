@@ -18,7 +18,7 @@ export abstract class Store<T> {
         return this.innerState;
     }
 
-    public subscribe(listener: (state: T) => void, immediate?: boolean): Subscription {
+    public subscribe(listener: (state: T) => void = Store.noOp, immediate?: boolean): Subscription {
         const token = this.listenerCounter++;
         if (this.listeners.size === 0) {
             this.preStart();
@@ -65,5 +65,9 @@ export abstract class Store<T> {
         for (const listener of this.listeners.values()) {
             listener(state);
         }
+    }
+
+    private static noOp() {
+        //
     }
 }

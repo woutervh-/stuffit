@@ -12,7 +12,7 @@ describe('HistoryStore', () => {
     describe('#state', () => {
         it('Holds the history of the source in its state up to a specified maximum frames.', () => {
             const store = new HistoryStore(source, 5);
-            const subscription = store.subscribe(() => { /**/ });
+            const subscription = store.subscribe();
 
             chai.assert.deepStrictEqual(store.state, [undefined, undefined, undefined, undefined, 0]);
             source.setState(1);
