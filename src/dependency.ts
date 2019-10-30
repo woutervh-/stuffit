@@ -48,4 +48,22 @@ export class Dependency<T> {
         this.lastVersion = this.innerSource.version;
         this.callback(state);
     }
+
+    public static updateAll(dependencies: Dependency<unknown>[]) {
+        for (const dependency of dependencies) {
+            dependency.update();
+        }
+    }
+
+    public static startAll(dependencies: Dependency<unknown>[]) {
+        for (const dependency of dependencies) {
+            dependency.start();
+        }
+    }
+
+    public static stopAll(dependencies: Dependency<unknown>[]) {
+        for (const dependency of dependencies) {
+            dependency.stop();
+        }
+    }
 }

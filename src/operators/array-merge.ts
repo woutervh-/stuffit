@@ -1,32 +1,24 @@
+import { Dependency } from '../dependency';
 import { Store } from '../store';
-import { Subscription } from '../subscription';
 
 export class ArrayMergeStore<T extends unknown[]> extends Store<T[number]> {
-    private sources: { [K in keyof T]: Store<T[K]> };
-    private subscriptions: Subscription[] = [];
+    private dependencies: Dependency<T[number]>[];
 
     public constructor(sources: { [K in keyof T]: Store<T[K]> }) {
         super(ArrayMergeStore.merge(sources));
-        this.sources = sources;
+        this.dependencies = sources.map((source) => new Dependency(source, this.handleNext));
     }
 
     protected preStart() {
-        //
+        Dependency.updateAll(this.dependencies);
     }
 
     protected start() {
-        this.subscriptions = this.sources.map(this.subscribeTo);
+        Dependency.startAll(this.dependencies);
     }
 
     protected stop() {
-        for (const subscription of this.subscriptions) {
-            subscription.unsubscribe();
-        }
-        this.subscriptions = [];
-    }
-
-    private subscribeTo = (source: Store<T[number]>) => {
-        return source.subscribe(this.handleNext);
+        Dependency.stopAll(this.dependencies);
     }
 
     private handleNext = (value: T[number]) => {
