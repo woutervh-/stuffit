@@ -1,36 +1,28 @@
+import { Dependency } from '../dependency';
 import { Store } from '../store';
-import { Subscription } from '../subscription';
 
 export class PluckStore<T, K extends keyof T> extends Store<T[K]> {
-    private source: Store<T>;
-    private key: K;
-    private subscription: Subscription | undefined = undefined;
+    private dependency: Dependency<T>;
 
-    public constructor(source: Store<T>, key: K) {
+    public constructor(source: Store<T>, private key: K) {
         super(source.state[key]);
-        this.source = source;
-        this.key = key;
+        this.dependency = new Dependency(source, this.handleNext);
     }
 
     protected preStart() {
-        //
+        this.dependency.update();
     }
 
     protected start() {
-        if (this.subscription === undefined) {
-            this.subscription = this.source.subscribe(this.handleNext);
-        }
+        this.dependency.start();
     }
 
     protected stop() {
-        if (this.subscription !== undefined) {
-            this.subscription.unsubscribe();
-            this.subscription = undefined;
-        }
+        this.dependency.stop();
     }
 
-    private handleNext = () => {
-        this.setInnerState(this.source.state[this.key]);
+    private handleNext = (state: T) => {
+        this.setInnerState(state[this.key]);
     }
 }
 
