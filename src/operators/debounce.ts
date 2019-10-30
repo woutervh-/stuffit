@@ -1,35 +1,25 @@
+import { Dependency } from '../dependency';
 import { Store } from '../store';
-import { Subscription } from '../subscription';
 
 export class DebounceStore<T> extends Store<T> {
-    private source: Store<T>;
-    private wait: number;
-    private immediate: boolean;
-    private subscription: Subscription | undefined = undefined;
+    private dependency: Dependency<T>;
     private timeout: number | undefined = undefined;
 
-    public constructor(source: Store<T>, wait: number, immediate?: boolean) {
+    public constructor(source: Store<T>, private wait: number, private immediate?: boolean) {
         super(source.state);
-        this.source = source;
-        this.wait = wait;
-        this.immediate = !!immediate;
+        this.dependency = new Dependency(source, this.handleNext);
     }
 
     protected preStart() {
-        //
+        this.dependency.update();
     }
 
     protected start() {
-        if (this.subscription === undefined) {
-            this.subscription = this.source.subscribe(this.handleNext);
-        }
+        this.dependency.start();
     }
 
     protected stop() {
-        if (this.subscription !== undefined) {
-            this.subscription.unsubscribe();
-            this.subscription = undefined;
-        }
+        this.dependency.stop();
     }
 
     private clearTimeout() {
