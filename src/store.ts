@@ -15,6 +15,9 @@ export abstract class Store<T> {
 
     public subscribe(listener: (value: T) => void, immediate?: boolean): Subscription {
         const token = this.listenerCounter++;
+        if (this.listeners.size === 0) {
+            this.preStart();
+        }
         this.listeners.set(token, listener);
         if (this.listeners.size === 1) {
             this.start();
@@ -48,6 +51,7 @@ export abstract class Store<T> {
         this.notify(state);
     }
 
+    protected abstract preStart(): void;
     protected abstract start(): void;
     protected abstract stop(): void;
 

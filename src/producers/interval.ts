@@ -9,6 +9,10 @@ export class IntervalStore extends Store<number> {
         this.timeout = timeout;
     }
 
+    protected preStart() {
+        //
+    }
+
     protected start() {
         if (this.timer === undefined) {
             this.timer = setInterval(this.handleInterval, this.timeout);

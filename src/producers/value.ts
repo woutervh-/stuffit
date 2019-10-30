@@ -1,6 +1,10 @@
 import { Store } from '../store';
 
 export class ValueStore<T> extends Store<T> {
+    protected preStart() {
+        //
+    }
+
     protected start() {
         //
     }

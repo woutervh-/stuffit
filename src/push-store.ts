@@ -5,6 +5,10 @@ export class PushStore<T> extends Store<T> {
         this.setInnerState(newState);
     }
 
+    protected preStart() {
+        //
+    }
+
     protected start() {
         //
     }

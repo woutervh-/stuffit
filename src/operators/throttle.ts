@@ -14,6 +14,10 @@ export class ThrottleStore<T> extends Store<T> {
         this.limit = limit;
     }
 
+    protected preStart() {
+        //
+    }
+
     protected start() {
         if (this.subscription === undefined) {
             this.subscription = this.source.subscribe(this.handleNext);

@@ -7,6 +7,10 @@ export class PromiseStore<T> extends Store<PromiseResult<T>> {
         promise.then(this.handlePromiseResult).catch(this.handlePromiseError);
     }
 
+    protected preStart() {
+        //
+    }
+
     protected start() {
         //
     }
