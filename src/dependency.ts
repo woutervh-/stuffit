@@ -2,10 +2,12 @@ import { Store } from './store';
 import { Subscription } from './subscription';
 
 export class Dependency<T> {
-    private subscription: Subscription | null = null;
+    private innerSource: Store<T>;
     private lastVersion: number;
+    private subscription: Subscription | null = null;
 
-    public constructor(private source: Store<T>, private callback: (state: T) => void) {
+    public constructor(source: Store<T>, private callback: (state: T) => void) {
+        this.innerSource = source;
         this.lastVersion = source.version;
     }
 
@@ -13,7 +15,7 @@ export class Dependency<T> {
         if (this.subscription) {
             return;
         }
-        this.subscription = this.source.subscribe(this.handleNext);
+        this.subscription = this.innerSource.subscribe(this.handleNext);
     }
 
     public stop() {
@@ -28,9 +30,13 @@ export class Dependency<T> {
         return this.lastVersion;
     }
 
+    public get source() {
+        return this.innerSource;
+    }
+
     public update() {
-        if (this.lastVersion !== this.source.version) {
-            this.handleNext(this.source.state);
+        if (this.lastVersion !== this.innerSource.version) {
+            this.handleNext(this.innerSource.state);
         }
     }
 
@@ -39,7 +45,7 @@ export class Dependency<T> {
     }
 
     private handleNext = (state: T) => {
-        this.lastVersion = this.source.version;
+        this.lastVersion = this.innerSource.version;
         this.callback(state);
     }
 }
