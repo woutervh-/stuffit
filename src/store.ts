@@ -13,20 +13,26 @@ export abstract class Store<T> {
         return this.innerState;
     }
 
-    public subscribe(listener: (value: T) => void): Subscription {
+    public subscribe(listener: (value: T) => void, immediate?: boolean): Subscription {
         const token = this.listenerCounter++;
         this.listeners.set(token, listener);
         if (this.listeners.size === 1) {
             this.start();
         }
-        return {
-            unsubscribe: () => {
-                if (this.listeners.size === 1) {
-                    this.stop();
+        const subscription = {
+            store: this,
+            token,
+            unsubscribe() {
+                if (this.store.listeners.size === 1) {
+                    this.store.stop();
                 }
-                this.listeners.delete(token);
+                this.store.listeners.delete(this.token);
             }
         };
+        if (immediate) {
+            listener(this.innerState);
+        }
+        return subscription;
     }
 
     public pipe<U>(transform: (source: this) => Store<U>): Store<U> {
