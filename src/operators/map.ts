@@ -12,6 +12,10 @@ export class MapStore<T, U> extends Store<U> {
         this.project = project;
     }
 
+    protected preStart() {
+        //
+    }
+
     protected start() {
         if (this.subscription === undefined) {
             this.subscription = this.source.subscribe(this.handleNext);

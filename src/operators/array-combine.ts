@@ -10,6 +10,10 @@ export class ArrayCombineStore<T extends unknown[]> extends Store<T> {
         this.sources = sources;
     }
 
+    protected preStart() {
+        //
+    }
+
     protected start() {
         if (this.subscriptions === undefined) {
             this.subscriptions = this.sources.map(this.subscribeTo);

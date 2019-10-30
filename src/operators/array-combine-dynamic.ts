@@ -12,6 +12,10 @@ export class ArrayCombineDynamicStore<T extends unknown[]> extends Store<T> {
         this.source = source;
     }
 
+    protected preStart() {
+        //
+    }
+
     protected start() {
         if (this.sourceSubscription === undefined) {
             this.sourceSubscription = this.source.subscribe(this.handleSourceNext);

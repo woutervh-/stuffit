@@ -12,6 +12,10 @@ export class ObjectCombinePropertiesStore<T extends {}> extends Store<T> {
         this.source = source;
     }
 
+    protected preStart() {
+        //
+    }
+
     protected start() {
         for (const key of Object.keys(this.source.state)) {
             this.sources[key as keyof T] = this.source.state[key as keyof T] as Store<T[keyof T]>;

@@ -11,6 +11,10 @@ export class ObjectSplitPropertiesStore<T extends {}> extends Store<{ [Key in ke
         this.source = source;
     }
 
+    protected preStart() {
+        //
+    }
+
     protected start() {
         if (this.subscription === undefined) {
             this.subscription = this.source.subscribe(this.handleNext);

@@ -12,6 +12,10 @@ export class PluckStore<T, K extends keyof T> extends Store<T[K]> {
         this.key = key;
     }
 
+    protected preStart() {
+        //
+    }
+
     protected start() {
         if (this.subscription === undefined) {
             this.subscription = this.source.subscribe(this.handleNext);

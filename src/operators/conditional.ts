@@ -16,6 +16,10 @@ export class ConditionalStore<T, U> extends Store<T | U> {
         this.sourceElse = sourceElse;
     }
 
+    protected preStart() {
+        //
+    }
+
     protected start() {
         this.handleSourceNext();
         if (this.sourceSubscription === undefined) {

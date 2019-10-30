@@ -18,6 +18,10 @@ export class ObjectPipePropertiesStore<T extends string, U extends { [Key in T]:
         this.targets = targets;
     }
 
+    protected preStart() {
+        //
+    }
+
     protected start() {
         for (const key of Object.keys(this.targets)) {
             this.subscriptions[key as T] = this.targets[key as T].subscribe(this.handleChange);
