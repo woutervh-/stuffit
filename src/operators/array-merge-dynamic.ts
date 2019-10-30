@@ -1,10 +1,15 @@
 import { Dependency } from '../dependency';
 import { Store } from '../store';
 
+// TODO: the behavior of this operator can be improved so that a change in the source store does not trigger a refresh which will use the last store for a new value.
+// TODO: this requires that we keep track of the previously used store and compare during updates.
+// TODO: it will be easier to do this if the store subscription can accept a listener that takes the store itself, not the new state.
+
 export class ArrayMergeDynamicStore<T extends unknown[]> extends Store<T[number]> {
     private dependency: Dependency<{ [K in keyof T]: Store<T[K]> }>;
     private dependencies: Dependency<T[number]>[];
     private sources: Store<T[number]>[];
+    // TODO: private previousSource: Store<T[number]>; // Keep track of previously used store; then when this store is deleted emit a new value.
 
     public constructor(source: Store<{ [K in keyof T]: Store<T[K]> }>) {
         super(ArrayMergeDynamicStore.merge<T>(source.state));
@@ -51,7 +56,7 @@ export class ArrayMergeDynamicStore<T extends unknown[]> extends Store<T[number]
         }
         this.dependencies = newDependencies;
 
-        this.setInnerState(ArrayMergeDynamicStore.merge<T>(newSources));
+        this.setInnerState(ArrayMergeDynamicStore.merge<T>(newSources)); // TODO: only do this if the previously used store was deleted, or if any new store was added (the latest).
     }
 
     private handleNext = (value: T[number]) => {
