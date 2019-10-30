@@ -52,5 +52,28 @@ describe('DebounceStore', () => {
 
             subscription.unsubscribe();
         });
+
+        it('Will reset the timeout when a value arrives before the timeout.', () => {
+            let count = 0;
+            const store = new DebounceStore(source, 100);
+            const subscription = store.subscribe(() => count += 1);
+
+            source.setState(1);
+            clock.tick(50);
+            source.setState(2);
+            clock.tick(50);
+            source.setState(3);
+            clock.tick(50);
+            source.setState(4);
+            clock.tick(50);
+
+            chai.assert.strictEqual(count, 0);
+
+            clock.tick(100);
+
+            chai.assert.strictEqual(count, 1);
+
+            subscription.unsubscribe();
+        });
     });
 });
