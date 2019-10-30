@@ -25,14 +25,7 @@ export class ThrottleStore<T> extends Store<T> {
             this.subscription.unsubscribe();
             this.subscription = undefined;
         }
-        if (this.throttleTimeout !== undefined) {
-            if (typeof this.limit === 'number') {
-                clearTimeout(this.throttleTimeout);
-            } else {
-                cancelAnimationFrame(this.throttleTimeout);
-            }
-            this.throttleTimeout = undefined;
-        }
+        this.clearTimeout();
         this.throttledState = undefined;
     }
 
@@ -41,23 +34,40 @@ export class ThrottleStore<T> extends Store<T> {
         if (this.throttledState) {
             this.setInnerState(this.throttledState.value);
             this.throttledState = undefined;
+            this.setTimeout();
         }
     }
 
     private handleNext = (value: T) => {
-        // TODO: fix bug where after the timeout emits a new value, any value arriving will immediately emit another.
-
         if (this.throttleTimeout === undefined) {
             this.setInnerState(value);
-
-            if (typeof this.limit === 'number') {
-                this.throttleTimeout = setTimeout(this.handleThrottledCallback, this.limit);
-            } else {
-                this.throttleTimeout = requestAnimationFrame(this.handleThrottledCallback);
-            }
+            this.setTimeout();
         } else {
             this.throttledState = { value };
         }
+    }
+
+    private setTimeout() {
+        if (this.throttleTimeout !== undefined) {
+            return;
+        }
+        if (typeof this.limit === 'number') {
+            this.throttleTimeout = setTimeout(this.handleThrottledCallback, this.limit);
+        } else {
+            this.throttleTimeout = requestAnimationFrame(this.handleThrottledCallback);
+        }
+    }
+
+    private clearTimeout() {
+        if (this.throttleTimeout === undefined) {
+            return;
+        }
+        if (typeof this.limit === 'number') {
+            clearTimeout(this.throttleTimeout);
+        } else {
+            cancelAnimationFrame(this.throttleTimeout);
+        }
+        this.throttleTimeout = undefined;
     }
 }
 
