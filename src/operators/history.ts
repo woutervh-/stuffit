@@ -1,30 +1,24 @@
+import { Dependency } from '../dependency';
 import { Store } from '../store';
-import { Subscription } from '../subscription';
 
 export class HistoryStore<T> extends Store<(T | undefined)[]> {
-    private source: Store<T>;
-    private subscription: Subscription | undefined = undefined;
+    private dependency: Dependency<T>;
 
     public constructor(source: Store<T>, frames: number) {
-        super(HistoryStore.emptyHistory(frames));
-        this.source = source;
+        super(HistoryStore.initialHistory(frames, source.state));
+        this.dependency = new Dependency(source, this.handleNext);
     }
 
     protected preStart() {
-        //
+        this.dependency.update();
     }
 
     protected start() {
-        if (this.subscription === undefined) {
-            this.subscription = this.source.subscribe(this.handleNext);
-        }
+        this.dependency.start();
     }
 
     protected stop() {
-        if (this.subscription !== undefined) {
-            this.subscription.unsubscribe();
-            this.subscription = undefined;
-        }
+        this.dependency.stop();
     }
 
     private handleNext = (value: T) => {
@@ -34,11 +28,12 @@ export class HistoryStore<T> extends Store<(T | undefined)[]> {
         this.setInnerState(history);
     }
 
-    private static emptyHistory(frames: number) {
-        const history: undefined[] = [];
-        for (let i = 0; i < frames; i++) {
+    private static initialHistory<T>(frames: number, initialState: T) {
+        const history: (T | undefined)[] = [];
+        for (let i = 0; i < frames - 1; i++) {
             history.push(undefined);
         }
+        history.push(initialState);
         return history;
     }
 }

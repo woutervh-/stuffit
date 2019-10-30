@@ -1,36 +1,28 @@
+import { Dependency } from '../dependency';
 import { Store } from '../store';
-import { Subscription } from '../subscription';
 
 export class MapStore<T, U> extends Store<U> {
-    private source: Store<T>;
-    private project: (value: T) => U;
-    private subscription: Subscription | undefined = undefined;
+    private dependency: Dependency<T>;
 
-    public constructor(source: Store<T>, project: (value: T) => U) {
+    public constructor(source: Store<T>, private project: (value: T) => U) {
         super(project(source.state));
-        this.source = source;
-        this.project = project;
+        this.dependency = new Dependency(source, this.handleNext);
     }
 
     protected preStart() {
-        //
+        this.dependency.update();
     }
 
     protected start() {
-        if (this.subscription === undefined) {
-            this.subscription = this.source.subscribe(this.handleNext);
-        }
+        this.dependency.start();
     }
 
     protected stop() {
-        if (this.subscription !== undefined) {
-            this.subscription.unsubscribe();
-            this.subscription = undefined;
-        }
+        this.dependency.stop();
     }
 
-    private handleNext = () => {
-        this.setInnerState(this.project(this.source.state));
+    private handleNext = (state: T) => {
+        this.setInnerState(this.project(state));
     }
 }
 
