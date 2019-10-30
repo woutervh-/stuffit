@@ -1,51 +1,42 @@
+import { Dependency } from '../dependency';
 import { Store } from '../store';
-import { Subscription } from '../subscription';
 
 export class FlattenStore<T> extends Store<T> {
-    private source: Store<Store<T>>;
-    private outerSubscription: Subscription | undefined = undefined;
-    private innerSubscription: Subscription | undefined = undefined;
+    private outerDependency: Dependency<Store<T>>;
+    private innerDependency: Dependency<T>;
 
     public constructor(source: Store<Store<T>>) {
         super(source.state.state);
-        this.source = source;
+        this.outerDependency = new Dependency(source, this.handleNextOuter);
+        this.innerDependency = new Dependency(source.state, this.handleNextInner);
     }
 
     protected preStart() {
-        //
+        this.outerDependency.update();
+        this.innerDependency.update();
     }
 
     protected start() {
-        if (this.innerSubscription === undefined) {
-            this.innerSubscription = this.source.state.subscribe(this.handleNextInner);
-        }
-        if (this.outerSubscription === undefined) {
-            this.outerSubscription = this.source.subscribe(this.handleNextOuter);
-        }
+        this.outerDependency.start();
+        this.innerDependency.start();
     }
 
     protected stop() {
-        if (this.outerSubscription !== undefined) {
-            this.outerSubscription.unsubscribe();
-            this.outerSubscription = undefined;
-        }
-        if (this.innerSubscription !== undefined) {
-            this.innerSubscription.unsubscribe();
-            this.innerSubscription = undefined;
-        }
+        this.innerDependency.stop();
+        this.outerDependency.stop();
     }
 
     private handleNextOuter = (store: Store<T>) => {
-        if (this.innerSubscription !== undefined) {
-            this.innerSubscription.unsubscribe();
-            this.innerSubscription = undefined;
+        if (this.innerDependency.hasStarted()) {
+            this.innerDependency.stop();
         }
-        this.innerSubscription = store.subscribe(this.handleNextInner);
-        this.setInnerState(this.source.state.state);
+        this.setInnerState(store.state);
+        this.innerDependency = new Dependency(store, this.handleNextInner);
+        this.innerDependency.start();
     }
 
-    private handleNextInner = () => {
-        this.setInnerState(this.source.state.state);
+    private handleNextInner = (state: T) => {
+        this.setInnerState(state);
     }
 }
 

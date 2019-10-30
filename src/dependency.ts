@@ -34,6 +34,10 @@ export class Dependency<T> {
         }
     }
 
+    public hasStarted() {
+        return this.subscription !== undefined;
+    }
+
     private handleNext = (state: T) => {
         this.lastVersion = this.source.version;
         this.callback(state);
