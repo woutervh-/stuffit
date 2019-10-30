@@ -1,37 +1,31 @@
+import { Dependency } from '../dependency';
 import { Store } from '../store';
-import { Subscription } from '../subscription';
 
 export class ArrayMergeDynamicStore<T extends unknown[]> extends Store<T[number]> {
-    private source: Store<{ [K in keyof T]: Store<T[K]> }>;
-    private subscription: Subscription | undefined = undefined;
-    private sources: Store<T[number]>[] = [];
-    private subscriptions: Subscription[] = [];
+    private dependency: Dependency<{ [K in keyof T]: Store<T[K]> }>;
+    private dependencies: Dependency<T[number]>[];
+    private sources: Store<T[number]>[];
 
     public constructor(source: Store<{ [K in keyof T]: Store<T[K]> }>) {
-        super(ArrayMergeDynamicStore.merge<T>(source));
-        this.source = source;
+        super(ArrayMergeDynamicStore.merge<T>(source.state));
+        this.dependency = new Dependency(source, this.handleSourceNext);
+        this.dependencies = source.state.map((store) => new Dependency(store, this.handleNext));
+        this.sources = source.state;
     }
 
     protected preStart() {
-        //
+        this.dependency.update();
+        Dependency.updateAll(this.dependencies);
     }
 
     protected start() {
-        if (this.subscription === undefined) {
-            this.subscription = this.source.subscribe(this.handleSourceNext);
-        }
+        this.dependency.start();
+        Dependency.startAll(this.dependencies);
     }
 
     protected stop() {
-        if (this.subscription !== undefined) {
-            this.subscription.unsubscribe();
-            this.subscription = undefined;
-        }
-        for (const subscription of this.subscriptions) {
-            subscription.unsubscribe();
-        }
-        this.sources = [];
-        this.subscriptions = [];
+        this.dependency.stop();
+        Dependency.stopAll(this.dependencies);
     }
 
     private handleSourceNext = (newSources: { [K in keyof T]: Store<T[K]> }) => {
@@ -39,32 +33,34 @@ export class ArrayMergeDynamicStore<T extends unknown[]> extends Store<T[number]
         for (let i = 0; i < oldSources.length; i++) {
             const source = oldSources[i];
             if (!newSources.includes(source)) {
-                this.subscriptions[i].unsubscribe();
+                this.dependencies[i].stop();
             }
         }
         this.sources = newSources;
 
-        const newSubscriptions: Subscription[] = [];
+        const newDependencies: Dependency<T[number]>[] = [];
         for (const newSource of newSources) {
             const index = oldSources.indexOf(newSource);
             if (index >= 0) {
-                newSubscriptions.push(this.subscriptions[index]);
+                newDependencies.push(this.dependencies[index]);
             } else {
-                newSubscriptions.push(newSource.subscribe(this.handleNext));
+                const dependency = new Dependency(newSource, this.handleNext);
+                newDependencies.push(dependency);
+                dependency.start();
             }
         }
-        this.subscriptions = newSubscriptions;
+        this.dependencies = newDependencies;
 
-        this.setInnerState(ArrayMergeDynamicStore.merge<T>(this.source));
+        this.setInnerState(ArrayMergeDynamicStore.merge<T>(newSources));
     }
 
     private handleNext = (value: T[number]) => {
         this.setInnerState(value);
     }
 
-    private static merge<T extends unknown[]>(source: Store<{ [K in keyof T]: Store<T[K]> }>): T[number] {
-        if (source.state.length >= 1) {
-            return source.state[source.state.length - 1].state;
+    private static merge<T extends unknown[]>(state: { [K in keyof T]: Store<T[K]> }): T[number] {
+        if (state.length >= 1) {
+            return state[state.length - 1].state;
         } else {
             throw new Error('There must be at least one source.');
         }
