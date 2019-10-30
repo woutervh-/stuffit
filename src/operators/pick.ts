@@ -1,36 +1,28 @@
+import { Dependency } from '../dependency';
 import { Store } from '../store';
-import { Subscription } from '../subscription';
 
 export class PickStore<T, K extends keyof T> extends Store<{ [Key in K]: T[Key] }> {
-    private source: Store<T>;
-    private keys: K[];
-    private subscription: Subscription | undefined = undefined;
+    private dependency: Dependency<T>;
 
-    public constructor(source: Store<T>, keys: K[]) {
+    public constructor(source: Store<T>, private keys: K[]) {
         super(PickStore.pick(source.state, keys));
-        this.source = source;
-        this.keys = keys;
+        this.dependency = new Dependency(source, this.handleNext);
     }
 
     protected preStart() {
-        //
+        this.dependency.update();
     }
 
     protected start() {
-        if (this.subscription === undefined) {
-            this.subscription = this.source.subscribe(this.handleNext);
-        }
+        this.dependency.stop();
     }
 
     protected stop() {
-        if (this.subscription !== undefined) {
-            this.subscription.unsubscribe();
-            this.subscription = undefined;
-        }
+        this.dependency.stop();
     }
 
-    private handleNext = () => {
-        this.setInnerState(PickStore.pick(this.source.state, this.keys));
+    private handleNext = (state: T) => {
+        this.setInnerState(PickStore.pick(state, this.keys));
     }
 
     private static pick<T, K extends keyof T>(value: T, keys: K[]): { [Key in K]: T[Key] } {
