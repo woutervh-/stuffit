@@ -1,28 +1,24 @@
+import { Dependency } from '../dependency';
 import { Store } from '../store';
-import { Subscription } from '../subscription';
 
 export class ReduceStore<T, U> extends Store<U> {
-    private source: Store<T>;
-    private subscription: Subscription | undefined = undefined;
-    private reduce: (accumulator: U, currentValue: T) => U;
+    private dependency: Dependency<T>;
 
-    constructor(source: Store<T>, reduce: (accumulator: U, currentValue: T) => U, initialValue: U) {
+    constructor(source: Store<T>, private reduce: (accumulator: U, currentValue: T) => U, initialValue: U) {
         super(reduce(initialValue, source.state));
-        this.source = source;
-        this.reduce = reduce;
+        this.dependency = new Dependency(source, this.handleNext);
+    }
+
+    protected preStart() {
+        this.dependency.update();
     }
 
     protected start() {
-        if (this.subscription === undefined) {
-            this.subscription = this.source.subscribe(this.handleNext);
-        }
+        this.dependency.start();
     }
 
     protected stop() {
-        if (this.subscription !== undefined) {
-            this.subscription.unsubscribe();
-            this.subscription = undefined;
-        }
+        this.dependency.stop();
     }
 
     private handleNext = (value: T) => {
