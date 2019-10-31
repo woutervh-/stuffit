@@ -3,19 +3,19 @@ import * as sinon from 'sinon';
 import { ThrottleStore } from '../../src/operators/throttle';
 import { PushStore } from '../../src/push-store';
 
-let clock: sinon.SinonFakeTimers;
-let source: PushStore<number>;
-
-beforeEach(() => {
-    clock = sinon.useFakeTimers();
-    source = new PushStore(0);
-});
-
-afterEach(() => {
-    clock.restore();
-});
-
 describe('ThrottleStore', () => {
+    let clock: sinon.SinonFakeTimers;
+    let source: PushStore<number>;
+
+    beforeEach(() => {
+        clock = sinon.useFakeTimers();
+        source = new PushStore(0);
+    });
+
+    afterEach(() => {
+        clock.restore();
+    });
+
     describe('#subscribe', () => {
         it('Will notify subscribers of state changes at most once per configured timeout.', () => {
             let count = 0;

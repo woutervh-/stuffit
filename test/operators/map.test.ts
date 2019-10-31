@@ -2,13 +2,13 @@ import * as chai from 'chai';
 import { MapStore } from '../../src/operators/map';
 import { PushStore } from '../../src/push-store';
 
-let source: PushStore<number>;
-
-beforeEach(() => {
-    source = new PushStore(0);
-});
-
 describe('MapStore', () => {
+    let source: PushStore<number>;
+
+    beforeEach(() => {
+        source = new PushStore(0);
+    });
+
     describe('#state', () => {
         it('Maps the state using the given project function.', () => {
             const store = new MapStore(source, () => 42);

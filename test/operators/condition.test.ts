@@ -2,17 +2,17 @@ import * as chai from 'chai';
 import { ConditionalStore } from '../../src/operators/conditional';
 import { PushStore } from '../../src/push-store';
 
-let ifSource: PushStore<number>;
-let elseSource: PushStore<number>;
-let source: PushStore<boolean>;
-
-beforeEach(() => {
-    ifSource = new PushStore(0);
-    elseSource = new PushStore(1);
-    source = new PushStore<boolean>(true);
-});
-
 describe('ConditionalStore', () => {
+    let ifSource: PushStore<number>;
+    let elseSource: PushStore<number>;
+    let source: PushStore<boolean>;
+
+    beforeEach(() => {
+        ifSource = new PushStore(0);
+        elseSource = new PushStore(1);
+        source = new PushStore<boolean>(true);
+    });
+
     describe('#state', () => {
         it('Switches to the the if- or else-source dependending on the outcome of the boolean source.', () => {
             const store = new ConditionalStore(source, ifSource, elseSource);

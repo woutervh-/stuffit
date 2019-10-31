@@ -3,19 +3,19 @@ import { ArrayMergeDynamicStore } from '../../src/operators/array-merge-dynamic'
 import { PushStore } from '../../src/push-store';
 import { Store } from '../../src/store';
 
-let source: PushStore<Store<number>[]>;
-let zeroRemainderSource: PushStore<number>;
-let oneRemainderSource: PushStore<number>;
-let twoRemainderSource: PushStore<number>;
-
-beforeEach(() => {
-    zeroRemainderSource = new PushStore(0);
-    oneRemainderSource = new PushStore(1);
-    twoRemainderSource = new PushStore(2);
-    source = new PushStore<Store<number>[]>([zeroRemainderSource, oneRemainderSource]);
-});
-
 describe('ArrayMergeDynamicStore', () => {
+    let source: PushStore<Store<number>[]>;
+    let zeroRemainderSource: PushStore<number>;
+    let oneRemainderSource: PushStore<number>;
+    let twoRemainderSource: PushStore<number>;
+
+    beforeEach(() => {
+        zeroRemainderSource = new PushStore(0);
+        oneRemainderSource = new PushStore(1);
+        twoRemainderSource = new PushStore(2);
+        source = new PushStore<Store<number>[]>([zeroRemainderSource, oneRemainderSource]);
+    });
+
     describe('#state', () => {
         it('Initially starts with the state of the last store in the array.', () => {
             const store = new ArrayMergeDynamicStore(source);

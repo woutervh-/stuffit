@@ -2,13 +2,13 @@ import * as chai from 'chai';
 import { ReduceStore } from '../../src/operators/reduce';
 import { PushStore } from '../../src/push-store';
 
-let source: PushStore<number>;
-
-beforeEach(() => {
-    source = new PushStore(1);
-});
-
 describe('ReduceStore', () => {
+    let source: PushStore<number>;
+
+    beforeEach(() => {
+        source = new PushStore(1);
+    });
+
     describe('#state', () => {
         it('Reduces over the source states starting with the initial state.', () => {
             const store = new ReduceStore(source, (sum, value) => sum + value, 0);

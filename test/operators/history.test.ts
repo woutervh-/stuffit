@@ -2,13 +2,13 @@ import * as chai from 'chai';
 import { HistoryStore } from '../../src/operators/history';
 import { PushStore } from '../../src/push-store';
 
-let source: PushStore<number>;
-
-beforeEach(() => {
-    source = new PushStore(0);
-});
-
 describe('HistoryStore', () => {
+    let source: PushStore<number>;
+
+    beforeEach(() => {
+        source = new PushStore(0);
+    });
+
     describe('#state', () => {
         it('Holds the history of the source in its state up to a specified maximum frames.', () => {
             const store = new HistoryStore(source, 5);

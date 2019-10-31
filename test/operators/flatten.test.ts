@@ -4,15 +4,15 @@ import { PushStore } from '../../src/push-store';
 import { Store } from '../../src/store';
 import { Subscription } from '../../src/subscription';
 
-let innerSource: PushStore<number>;
-let outerSource: PushStore<Store<number>>;
-
-beforeEach(() => {
-    innerSource = new PushStore(0);
-    outerSource = new PushStore(innerSource as Store<number>);
-});
-
 describe('FlattenStore', () => {
+    let innerSource: PushStore<number>;
+    let outerSource: PushStore<Store<number>>;
+
+    beforeEach(() => {
+        innerSource = new PushStore(0);
+        outerSource = new PushStore(innerSource as Store<number>);
+    });
+
     describe('#state', () => {
         it('Flattens the source to emit the inner source values.', () => {
             const store = new FlattenStore(outerSource);

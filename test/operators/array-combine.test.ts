@@ -2,15 +2,15 @@ import * as chai from 'chai';
 import { ArrayCombineStore } from '../../src/operators/array-combine';
 import { PushStore } from '../../src/push-store';
 
-let evenSource: PushStore<number>;
-let oddSource: PushStore<number>;
-
-beforeEach(() => {
-    evenSource = new PushStore(0);
-    oddSource = new PushStore(1);
-});
-
 describe('ArrayCombineStore', () => {
+    let evenSource: PushStore<number>;
+    let oddSource: PushStore<number>;
+
+    beforeEach(() => {
+        evenSource = new PushStore(0);
+        oddSource = new PushStore(1);
+    });
+
     describe('#state', () => {
         it('Copies all the states of the sources and combines them into an array.', () => {
             const store = new ArrayCombineStore([evenSource, oddSource]);

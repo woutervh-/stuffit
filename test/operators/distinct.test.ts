@@ -2,13 +2,13 @@ import * as chai from 'chai';
 import { DistinctStore } from '../../src/operators/distinct';
 import { PushStore } from '../../src/push-store';
 
-let source: PushStore<number>;
-
-beforeEach(() => {
-    source = new PushStore(0);
-});
-
 describe('DistinctStore', () => {
+    let source: PushStore<number>;
+
+    beforeEach(() => {
+        source = new PushStore(0);
+    });
+
     describe('#state', () => {
         it('Copies the state of the input source.', () => {
             const store = new DistinctStore(source, (previous, next) => previous === next);

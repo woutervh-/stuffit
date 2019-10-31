@@ -3,19 +3,19 @@ import * as sinon from 'sinon';
 import { DebounceStore } from '../../src/operators/debounce';
 import { PushStore } from '../../src/push-store';
 
-let clock: sinon.SinonFakeTimers;
-let source: PushStore<number>;
-
-beforeEach(() => {
-    clock = sinon.useFakeTimers();
-    source = new PushStore(0);
-});
-
-afterEach(() => {
-    clock.restore();
-});
-
 describe('DebounceStore', () => {
+    let clock: sinon.SinonFakeTimers;
+    let source: PushStore<number>;
+
+    beforeEach(() => {
+        clock = sinon.useFakeTimers();
+        source = new PushStore(0);
+    });
+
+    afterEach(() => {
+        clock.restore();
+    });
+
     describe('#subscribe', () => {
         it('Will notify subscribers of state changes after the timeout has passed.', () => {
             let count = 0;
