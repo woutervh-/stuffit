@@ -6,7 +6,7 @@ export class Dependency<T> {
     private lastVersion: number;
     private subscription: Subscription | null = null;
 
-    public constructor(source: Store<T>, private callback: (state: T) => void) {
+    public constructor(source: Store<T>, private callback: (state: T, store: Store<T>) => void) {
         this.innerSource = source;
         this.lastVersion = source.version;
     }
@@ -36,7 +36,7 @@ export class Dependency<T> {
 
     public update() {
         if (this.lastVersion !== this.innerSource.version) {
-            this.handleNext(this.innerSource.state);
+            this.handleNext();
         }
     }
 
@@ -44,9 +44,9 @@ export class Dependency<T> {
         return this.subscription !== undefined;
     }
 
-    private handleNext = (state: T) => {
+    private handleNext = () => {
         this.lastVersion = this.innerSource.version;
-        this.callback(state);
+        this.callback(this.innerSource.state, this.innerSource);
     }
 
     public static updateAll(dependencies: Dependency<unknown>[]) {

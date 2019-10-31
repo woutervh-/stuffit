@@ -1,6 +1,7 @@
 import * as chai from 'chai';
 import { ReduceStore } from '../../src/operators/reduce';
 import { PushStore } from '../../src/push-store';
+import { counterSubscriber } from '../counter-subscriber';
 
 describe('ReduceStore', () => {
     let source: PushStore<number>;
@@ -22,17 +23,16 @@ describe('ReduceStore', () => {
 
     describe('#subscribe', () => {
         it('Notifies subscribers when the underlying source has changed.', () => {
-            let count = 0;
             const store = new ReduceStore(source, (sum, value) => sum + value, 0);
-            const subscription = store.subscribe(() => count += 1);
+            const subscription = store.compose(counterSubscriber);
 
-            chai.assert.strictEqual(count, 0);
+            chai.assert.strictEqual(subscription.count, 0);
             source.setState(1);
-            chai.assert.strictEqual(count, 1);
+            chai.assert.strictEqual(subscription.count, 1);
             source.setState(2);
-            chai.assert.strictEqual(count, 2);
+            chai.assert.strictEqual(subscription.count, 2);
             source.setState(2);
-            chai.assert.strictEqual(count, 3);
+            chai.assert.strictEqual(subscription.count, 3);
 
             subscription.unsubscribe();
         });

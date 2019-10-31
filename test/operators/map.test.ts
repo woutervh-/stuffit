@@ -1,6 +1,7 @@
 import * as chai from 'chai';
 import { MapStore } from '../../src/operators/map';
 import { PushStore } from '../../src/push-store';
+import { counterSubscriber } from '../counter-subscriber';
 
 describe('MapStore', () => {
     let source: PushStore<number>;
@@ -31,17 +32,16 @@ describe('MapStore', () => {
 
     describe('#subscribe', () => {
         it('Notifies subscribers when the underlying source has changed.', () => {
-            let count = 0;
             const store = new MapStore(source, () => 42);
-            const subscription = store.subscribe(() => count += 1);
+            const subscription = store.compose(counterSubscriber);
 
-            chai.assert.strictEqual(count, 0);
+            chai.assert.strictEqual(subscription.count, 0);
             source.setState(1);
-            chai.assert.strictEqual(count, 1);
+            chai.assert.strictEqual(subscription.count, 1);
             source.setState(2);
-            chai.assert.strictEqual(count, 2);
+            chai.assert.strictEqual(subscription.count, 2);
             source.setState(2);
-            chai.assert.strictEqual(count, 3);
+            chai.assert.strictEqual(subscription.count, 3);
 
             subscription.unsubscribe();
         });

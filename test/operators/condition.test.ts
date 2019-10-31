@@ -1,6 +1,7 @@
 import * as chai from 'chai';
 import { ConditionalStore } from '../../src/operators/conditional';
 import { PushStore } from '../../src/push-store';
+import { counterSubscriber } from '../counter-subscriber';
 
 describe('ConditionalStore', () => {
     let ifSource: PushStore<number>;
@@ -45,43 +46,40 @@ describe('ConditionalStore', () => {
 
     describe('#subscribe', () => {
         it('Triggers notifications when either the boolean source or the active branch emits new values.', () => {
-            let count = 0;
             const store = new ConditionalStore(source, ifSource, elseSource);
-            const subscription = store.subscribe(() => count += 1);
+            const subscription = store.compose(counterSubscriber);
 
-            chai.assert.strictEqual(count, 0);
+            chai.assert.strictEqual(subscription.count, 0);
             source.setState(false);
-            chai.assert.strictEqual(count, 1);
+            chai.assert.strictEqual(subscription.count, 1);
             elseSource.setState(3);
-            chai.assert.strictEqual(count, 2);
+            chai.assert.strictEqual(subscription.count, 2);
 
             subscription.unsubscribe();
         });
 
         it('Does not trigger notification if the boolean source emits subsequent identical values.', () => {
-            let count = 0;
             const store = new ConditionalStore(source, ifSource, elseSource);
-            const subscription = store.subscribe(() => count += 1);
+            const subscription = store.compose(counterSubscriber);
 
-            chai.assert.strictEqual(count, 0);
+            chai.assert.strictEqual(subscription.count, 0);
             source.setState(false);
-            chai.assert.strictEqual(count, 1);
+            chai.assert.strictEqual(subscription.count, 1);
             source.setState(false);
-            chai.assert.strictEqual(count, 1);
+            chai.assert.strictEqual(subscription.count, 1);
 
             subscription.unsubscribe();
         });
 
         it('Does not trigger notification if the branch which is inactive changes state.', () => {
-            let count = 0;
             const store = new ConditionalStore(source, ifSource, elseSource);
-            const subscription = store.subscribe(() => count += 1);
+            const subscription = store.compose(counterSubscriber);
 
-            chai.assert.strictEqual(count, 0);
+            chai.assert.strictEqual(subscription.count, 0);
             source.setState(false);
-            chai.assert.strictEqual(count, 1);
+            chai.assert.strictEqual(subscription.count, 1);
             ifSource.setState(2);
-            chai.assert.strictEqual(count, 1);
+            chai.assert.strictEqual(subscription.count, 1);
 
             subscription.unsubscribe();
         });

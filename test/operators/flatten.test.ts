@@ -3,6 +3,7 @@ import { FlattenStore } from '../../src/operators/flatten';
 import { PushStore } from '../../src/push-store';
 import { Store } from '../../src/store';
 import { Subscription } from '../../src/subscription';
+import { counterSubscriber } from '../counter-subscriber';
 
 describe('FlattenStore', () => {
     let innerSource: PushStore<number>;
@@ -71,23 +72,22 @@ describe('FlattenStore', () => {
 
     describe('#subscribe', () => {
         it('Notifies the subscriber whenever the inner or outer source change state.', () => {
-            let count = 0;
             const store = new FlattenStore(outerSource);
-            const subscription = store.subscribe(() => count += 1);
+            const subscription = store.compose(counterSubscriber);
 
             innerSource.setState(1);
-            chai.assert.strictEqual(count, 1);
+            chai.assert.strictEqual(subscription.count, 1);
 
             outerSource.setState(new PushStore(2));
-            chai.assert.strictEqual(count, 2);
+            chai.assert.strictEqual(subscription.count, 2);
             outerSource.setState(new PushStore(3));
-            chai.assert.strictEqual(count, 3);
+            chai.assert.strictEqual(subscription.count, 3);
 
             const newInnerSource = new PushStore(4);
             outerSource.setState(newInnerSource);
-            chai.assert.strictEqual(count, 4);
+            chai.assert.strictEqual(subscription.count, 4);
             newInnerSource.setState(5);
-            chai.assert.strictEqual(count, 5);
+            chai.assert.strictEqual(subscription.count, 5);
 
             subscription.unsubscribe();
         });

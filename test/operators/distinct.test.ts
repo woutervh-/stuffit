@@ -1,6 +1,7 @@
 import * as chai from 'chai';
 import { DistinctStore } from '../../src/operators/distinct';
 import { PushStore } from '../../src/push-store';
+import { counterSubscriber } from '../counter-subscriber';
 
 describe('DistinctStore', () => {
     let source: PushStore<number>;
@@ -26,23 +27,22 @@ describe('DistinctStore', () => {
 
     describe('#subscribe', () => {
         it('Only emits state changes when the source state and the current state do not pass the equality test.', () => {
-            let count = 0;
             const store = new DistinctStore(source, (previous, next) => previous === next);
-            const subscription = store.subscribe(() => count += 1);
+            const subscription = store.compose(counterSubscriber);
 
-            chai.assert.strictEqual(count, 0);
+            chai.assert.strictEqual(subscription.count, 0);
             source.setState(0);
-            chai.assert.strictEqual(count, 0);
+            chai.assert.strictEqual(subscription.count, 0);
             source.setState(1);
-            chai.assert.strictEqual(count, 1);
+            chai.assert.strictEqual(subscription.count, 1);
             source.setState(1);
-            chai.assert.strictEqual(count, 1);
+            chai.assert.strictEqual(subscription.count, 1);
             source.setState(2);
-            chai.assert.strictEqual(count, 2);
+            chai.assert.strictEqual(subscription.count, 2);
             source.setState(3);
-            chai.assert.strictEqual(count, 3);
+            chai.assert.strictEqual(subscription.count, 3);
             source.setState(3);
-            chai.assert.strictEqual(count, 3);
+            chai.assert.strictEqual(subscription.count, 3);
 
             subscription.unsubscribe();
         });

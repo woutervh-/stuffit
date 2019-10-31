@@ -1,37 +1,31 @@
+import { Dependency } from '../dependency';
 import { Store } from '../store';
-import { Subscription } from '../subscription';
 
 export class ArrayCombineDynamicStore<T extends unknown[]> extends Store<T> {
-    private source: Store<{ [K in keyof T]: Store<T[K]> }>;
-    private sourceSubscription: Subscription | undefined = undefined;
-    private sources: Store<T[number]>[] = [];
-    private subscriptions: Subscription[] = [];
+    private dependency: Dependency<{ [K in keyof T]: Store<T[K]> }>;
+    private dependencies: Dependency<T[number]>[];
+    private sources: { [K in keyof T]: Store<T[K]> };
 
     public constructor(source: Store<{ [K in keyof T]: Store<T[K]> }>) {
-        super(ArrayCombineDynamicStore.combine<T>(source));
-        this.source = source;
+        super(ArrayCombineDynamicStore.combine<T>(source.state));
+        this.dependency = new Dependency(source, this.handleSourceNext);
+        this.dependencies = source.state.map((store) => new Dependency(store, this.handleNext));
+        this.sources = source.state;
     }
 
     protected preStart() {
-        //
+        this.dependency.update();
+        Dependency.updateAll(this.dependencies);
     }
 
     protected start() {
-        if (this.sourceSubscription === undefined) {
-            this.sourceSubscription = this.source.subscribe(this.handleSourceNext);
-        }
+        this.dependency.start();
+        Dependency.startAll(this.dependencies);
     }
 
     protected stop() {
-        if (this.sourceSubscription !== undefined) {
-            this.sourceSubscription.unsubscribe();
-            this.sourceSubscription = undefined;
-        }
-        for (const subscription of this.subscriptions) {
-            subscription.unsubscribe();
-        }
-        this.sources = [];
-        this.subscriptions = [];
+        this.dependency.stop();
+        Dependency.stopAll(this.dependencies);
     }
 
     private handleSourceNext = (newSources: { [K in keyof T]: Store<T[K]> }) => {
@@ -39,31 +33,33 @@ export class ArrayCombineDynamicStore<T extends unknown[]> extends Store<T> {
         for (let i = 0; i < oldSources.length; i++) {
             const source = oldSources[i];
             if (!newSources.includes(source)) {
-                this.subscriptions[i].unsubscribe();
+                this.dependencies[i].stop();
             }
         }
         this.sources = newSources;
 
-        const newSubscriptions: Subscription[] = [];
+        const newDependencies: Dependency<T[number]>[] = [];
         for (const newSource of newSources) {
             const index = oldSources.indexOf(newSource);
             if (index >= 0) {
-                newSubscriptions.push(this.subscriptions[index]);
+                newDependencies.push(this.dependencies[index]);
             } else {
-                newSubscriptions.push(newSource.subscribe(this.handleNext));
+                const dependency = new Dependency(newSource, this.handleNext);
+                newDependencies.push(dependency);
+                dependency.start();
             }
         }
-        this.subscriptions = newSubscriptions;
+        this.dependencies = newDependencies;
 
-        this.setInnerState(ArrayCombineDynamicStore.combine<T>(this.source));
+        this.setInnerState(ArrayCombineDynamicStore.combine<T>(newSources));
     }
 
     private handleNext = () => {
-        this.setInnerState(ArrayCombineDynamicStore.combine<T>(this.source));
+        this.setInnerState(ArrayCombineDynamicStore.combine<T>(this.sources));
     }
 
-    private static combine<T extends unknown[]>(source: Store<{ [K in keyof T]: Store<T[K]> }>) {
-        return source.state.map((source) => source.state) as T;
+    private static combine<T extends unknown[]>(state: { [K in keyof T]: Store<T[K]> }) {
+        return state.map((source) => source.state) as T;
     }
 }
 

@@ -54,16 +54,16 @@ export abstract class Store<T> {
     protected setInnerState(state: T) {
         this.innerVersion += 1;
         this.innerState = state;
-        this.notify(state);
+        this.notify();
     }
 
     protected abstract preStart(): void;
     protected abstract start(): void;
     protected abstract stop(): void;
 
-    private notify(state: T) {
+    private notify() {
         for (const listener of this.listeners.values()) {
-            listener(state);
+            listener(this.innerState);
         }
     }
 

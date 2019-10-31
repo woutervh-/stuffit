@@ -1,6 +1,7 @@
 import * as chai from 'chai';
 import { ArrayCombineStore } from '../../src/operators/array-combine';
 import { PushStore } from '../../src/push-store';
+import { counterSubscriber } from '../counter-subscriber';
 
 describe('ArrayCombineStore', () => {
     let evenSource: PushStore<number>;
@@ -28,17 +29,16 @@ describe('ArrayCombineStore', () => {
 
     describe('#subscribe', () => {
         it('Notifies the subscriber whenever one of the underlying sources changes state.', () => {
-            let count = 0;
             const store = new ArrayCombineStore([evenSource, oddSource]);
-            const subscription = store.subscribe(() => count += 1);
+            const subscription = store.compose(counterSubscriber);
 
-            chai.assert.deepStrictEqual(count, 0);
+            chai.assert.deepStrictEqual(subscription.count, 0);
             evenSource.setState(2);
-            chai.assert.deepStrictEqual(count, 1);
+            chai.assert.deepStrictEqual(subscription.count, 1);
             oddSource.setState(3);
-            chai.assert.deepStrictEqual(count, 2);
+            chai.assert.deepStrictEqual(subscription.count, 2);
             oddSource.setState(5);
-            chai.assert.deepStrictEqual(count, 3);
+            chai.assert.deepStrictEqual(subscription.count, 3);
 
             subscription.unsubscribe();
         });
