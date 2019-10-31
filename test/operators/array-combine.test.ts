@@ -32,13 +32,13 @@ describe('ArrayCombineStore', () => {
             const store = new ArrayCombineStore([evenSource, oddSource]);
             const subscription = store.compose(counterSubscriber);
 
-            chai.assert.deepStrictEqual(subscription.count, 0);
+            chai.assert.strictEqual(subscription.count, 0);
             evenSource.setState(2);
-            chai.assert.deepStrictEqual(subscription.count, 1);
+            chai.assert.strictEqual(subscription.count, 1);
             oddSource.setState(3);
-            chai.assert.deepStrictEqual(subscription.count, 2);
+            chai.assert.strictEqual(subscription.count, 2);
             oddSource.setState(5);
-            chai.assert.deepStrictEqual(subscription.count, 3);
+            chai.assert.strictEqual(subscription.count, 3);
 
             subscription.unsubscribe();
         });

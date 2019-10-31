@@ -1,68 +1,67 @@
+import { Dependency } from '../dependency';
 import { Store } from '../store';
-import { Subscription } from '../subscription';
 
 export class ObjectCombinePropertiesStore<T extends {}> extends Store<T> {
-    private source: Store<{ [Key in keyof T]: Store<T[Key]> }>;
-    private subscription: Subscription | undefined = undefined;
+    private dependency: Dependency<{ [Key in keyof T]: Store<T[Key]> }>;
+    private dependencies: { [Key: string]: Dependency<unknown> };
     private sources = {} as { [Key in keyof T]: Store<T[Key]> };
-    private subscriptions = {} as { [Key in keyof T]: Subscription };
 
     public constructor(source: Store<{ [Key in keyof T]: Store<T[Key]> }>) {
         super(ObjectCombinePropertiesStore.combine(source.state));
-        this.source = source;
+        this.dependency = new Dependency(source, this.handleSourceNext);
+        this.dependencies = {} as { [Key in keyof T]: Dependency<unknown> };
+        for (const key of Object.keys(source.state)) {
+            this.dependencies[key] = new Dependency<unknown>(source.state[key as keyof T] as Store<unknown>, this.handleNext);
+        }
+        this.sources = source.state;
     }
 
     protected preStart() {
-        //
+        this.dependency.update();
+        Dependency.updateAll(this.getDependenciesArray());
     }
 
     protected start() {
-        for (const key of Object.keys(this.source.state)) {
-            this.sources[key as keyof T] = this.source.state[key as keyof T] as Store<T[keyof T]>;
-            this.subscriptions[key as keyof T] = this.source.state[key as keyof T].subscribe(this.handleChange);
-        }
-        if (this.subscription === undefined) {
-            this.subscription = this.source.subscribe(this.handleNext);
-        }
+        this.dependency.start();
+        Dependency.startAll(this.getDependenciesArray());
     }
 
     protected stop() {
-        if (this.subscription !== undefined) {
-            this.subscription.unsubscribe();
-            this.subscription = undefined;
-        }
-        for (const key of Object.keys(this.subscriptions)) {
-            this.subscriptions[key as keyof T].unsubscribe();
-        }
-        this.sources = {} as { [Key in keyof T]: Store<T[Key]> };
-        this.subscriptions = {} as { [Key in keyof T]: Subscription };
+        this.dependency.stop();
+        Dependency.stopAll(this.getDependenciesArray());
     }
 
-    private handleNext = (newSources: { [Key in keyof T]: Store<T[Key]> }) => {
+    private handleSourceNext = (newSources: { [Key in keyof T]: Store<T[Key]> }) => {
         const oldSources = this.sources;
         for (const key of Object.keys(oldSources)) {
             if (!(key in newSources) || oldSources[key as keyof T] !== newSources[key as keyof T]) {
-                this.subscriptions[key as keyof T].unsubscribe();
-                delete this.subscriptions[key as keyof T];
+                this.dependencies[key].stop();
+                delete this.dependencies[key];
             }
         }
         this.sources = newSources;
 
-        const newSubscriptions = {} as { [Key in keyof T]: Subscription };
+        const newDependencies = {} as { [Key: string]: Dependency<unknown> };
         for (const key of Object.keys(newSources)) {
-            if (key in this.subscriptions) {
-                newSubscriptions[key as keyof T] = this.subscriptions[key as keyof T];
+            if (key in this.dependencies) {
+                newDependencies[key] = this.dependencies[key];
             } else {
-                newSubscriptions[key as keyof T] = newSources[key as keyof T].subscribe(this.handleChange);
+                const dependency = new Dependency(newSources[key as keyof T] as Store<unknown>, this.handleNext);
+                newDependencies[key] = dependency;
+                dependency.start();
             }
         }
-        this.subscriptions = newSubscriptions;
+        this.dependencies = newDependencies;
 
-        this.handleChange();
+        this.handleNext();
     }
 
-    private handleChange = () => {
-        this.setInnerState(ObjectCombinePropertiesStore.combine(this.source.state));
+    private handleNext = () => {
+        this.setInnerState(ObjectCombinePropertiesStore.combine(this.sources));
+    }
+
+    private getDependenciesArray() {
+        return Object.keys(this.dependencies).map((key) => this.dependencies[key]);
     }
 
     private static combine<T extends { [Key: string]: unknown }>(sources: { [Key in keyof T]: Store<T[Key]> }): T {

@@ -54,7 +54,8 @@
             true
         ],
         "object-literal-sort-keys": [
-            true
+            true,
+            "match-declaration-order"
         ],
         "no-shadowed-variable": [
             false
