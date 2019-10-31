@@ -3,7 +3,6 @@ import { ObjectCombinePropertiesStore } from '../../src/operators/object-combine
 import { PushStore } from '../../src/push-store';
 import { Store } from '../../src/store';
 import { counterSubscriber } from '../counter-subscriber';
-// import { counterSubscriber } from '../counter-subscriber';
 
 describe('ObjectCombinePropertiesStore', () => {
     let source: PushStore<{ zero?: Store<number>, one?: Store<number>, two?: Store<number> }>;
