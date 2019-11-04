@@ -1,6 +1,6 @@
 {
   "name": "stuffit",
-  "version": "0.4.6",
+  "version": "0.5.0",
   "description": "Observable state stores.",
   "main": "lib/es6/index.js",
   "module": "lib/es6/index.js",
