@@ -49,19 +49,19 @@ export class Dependency<T> {
         this.callback(this.innerSource.state, this.innerSource);
     }
 
-    public static updateAll(dependencies: Dependency<unknown>[]) {
+    public static updateAll<T>(dependencies: Dependency<T>[]) {
         for (const dependency of dependencies) {
             dependency.update();
         }
     }
 
-    public static startAll(dependencies: Dependency<unknown>[]) {
+    public static startAll<T>(dependencies: Dependency<T>[]) {
         for (const dependency of dependencies) {
             dependency.start();
         }
     }
 
-    public static stopAll(dependencies: Dependency<unknown>[]) {
+    public static stopAll<T>(dependencies: Dependency<T>[]) {
         for (const dependency of dependencies) {
             dependency.stop();
         }

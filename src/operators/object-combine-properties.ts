@@ -11,7 +11,7 @@ export class ObjectCombinePropertiesStore<T extends {}> extends Store<T> {
         this.dependency = new Dependency(source, this.handleSourceNext);
         this.dependencies = {} as { [Key in keyof T]: Dependency<unknown> };
         for (const key of Object.keys(source.state)) {
-            this.dependencies[key] = new Dependency<unknown>(source.state[key as keyof T] as Store<unknown>, this.handleNext);
+            this.dependencies[key] = new Dependency(source.state[key as keyof T] as Store<unknown>, this.handleNext);
         }
         this.sources = source.state;
     }
@@ -46,9 +46,8 @@ export class ObjectCombinePropertiesStore<T extends {}> extends Store<T> {
             if (key in this.dependencies) {
                 newDependencies[key] = this.dependencies[key];
             } else {
-                const dependency = new Dependency(newSources[key as keyof T] as Store<unknown>, this.handleNext);
-                newDependencies[key] = dependency;
-                dependency.start();
+                newDependencies[key] = new Dependency(newSources[key as keyof T] as Store<unknown>, this.handleNext);
+                newDependencies[key].start();
             }
         }
         this.dependencies = newDependencies;
