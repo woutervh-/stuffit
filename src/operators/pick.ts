@@ -14,7 +14,7 @@ export class PickStore<T, K extends keyof T> extends Store<{ [Key in K]: T[Key] 
     }
 
     protected start() {
-        this.dependency.stop();
+        this.dependency.start();
     }
 
     protected stop() {
