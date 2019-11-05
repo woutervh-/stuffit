@@ -16,13 +16,14 @@ export class ObjectPipePropertiesStore<T extends string, U extends { [Key in T]:
     }
 
     protected preStart() {
-        Dependency.updateAll(this.getDependenciesArray());
         Dependency.startAll(this.getDependenciesArray());
+        Dependency.updateAll(this.getDependenciesArray());
+        this.dependency.start();
         this.dependency.update();
     }
 
     protected start() {
-        this.dependency.start();
+        //
     }
 
     protected stop() {

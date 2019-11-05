@@ -10,11 +10,12 @@ export class PluckStore<T, K extends keyof T> extends Store<T[K]> {
     }
 
     protected preStart() {
+        this.dependency.start();
         this.dependency.update();
     }
 
     protected start() {
-        this.dependency.start();
+        //
     }
 
     protected stop() {

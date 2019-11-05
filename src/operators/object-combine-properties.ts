@@ -17,13 +17,14 @@ export class ObjectCombinePropertiesStore<T extends {}> extends Store<T> {
     }
 
     protected preStart() {
-        this.dependency.update();
+        Dependency.startAll(this.getDependenciesArray());
         Dependency.updateAll(this.getDependenciesArray());
+        this.dependency.start();
+        this.dependency.update();
     }
 
     protected start() {
-        this.dependency.start();
-        Dependency.startAll(this.getDependenciesArray());
+        //
     }
 
     protected stop() {

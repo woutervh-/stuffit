@@ -14,13 +14,14 @@ export class ArrayCombineDynamicStore<T extends unknown[]> extends Store<T> {
     }
 
     protected preStart() {
-        this.dependency.update();
+        Dependency.startAll(this.dependencies);
         Dependency.updateAll(this.dependencies);
+        this.dependency.start();
+        this.dependency.update();
     }
 
     protected start() {
-        this.dependency.start();
-        Dependency.startAll(this.dependencies);
+        //
     }
 
     protected stop() {

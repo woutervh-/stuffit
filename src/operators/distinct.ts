@@ -10,11 +10,12 @@ export class DistinctStore<T> extends Store<T> {
     }
 
     protected preStart() {
+        this.dependency.start();
         this.dependency.update();
     }
 
     protected start() {
-        this.dependency.start();
+        //
     }
 
     protected stop() {

@@ -11,11 +11,12 @@ export class ObjectSplitPropertiesStore<T extends {}> extends Store<{ [Key in ke
     }
 
     protected preStart() {
+        this.dependency.start();
         this.dependency.update();
     }
 
     protected start() {
-        this.dependency.start();
+        //
     }
 
     protected stop() {

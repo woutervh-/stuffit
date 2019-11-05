@@ -12,13 +12,14 @@ export class FlattenStore<T> extends Store<T> {
     }
 
     protected preStart() {
-        this.outerDependency.update();
+        this.innerDependency.start();
         this.innerDependency.update();
+        this.outerDependency.start();
+        this.outerDependency.update();
     }
 
     protected start() {
-        this.outerDependency.start();
-        this.innerDependency.start();
+        //
     }
 
     protected stop() {

@@ -10,11 +10,12 @@ export class MapStore<T, U> extends Store<U> {
     }
 
     protected preStart() {
+        this.dependency.start();
         this.dependency.update();
     }
 
     protected start() {
-        this.dependency.start();
+        //
     }
 
     protected stop() {

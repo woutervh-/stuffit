@@ -10,11 +10,12 @@ export class HistoryStore<T> extends Store<(T | undefined)[]> {
     }
 
     protected preStart() {
+        this.dependency.start();
         this.dependency.update();
     }
 
     protected start() {
-        this.dependency.start();
+        //
     }
 
     protected stop() {

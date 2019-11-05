@@ -10,11 +10,12 @@ export class ArrayMergeStore<T extends unknown[]> extends Store<T[number]> {
     }
 
     protected preStart() {
+        Dependency.startAll(this.dependencies);
         Dependency.updateAll(this.dependencies);
     }
 
     protected start() {
-        Dependency.startAll(this.dependencies);
+        //
     }
 
     protected stop() {

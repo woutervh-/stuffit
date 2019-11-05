@@ -14,13 +14,14 @@ export class ConditionalStore<T, U> extends Store<T | U> {
     }
 
     protected preStart() {
-        this.sourceDependency.update();
+        this.activeDependency.start();
         this.activeDependency.update();
+        this.sourceDependency.start();
+        this.sourceDependency.update();
     }
 
     protected start() {
-        this.sourceDependency.start();
-        this.activeDependency.start();
+        //
     }
 
     protected stop() {
