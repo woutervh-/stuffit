@@ -18,6 +18,15 @@ export abstract class Store<T> {
         return this.innerState;
     }
 
+    public refresh() {
+        if (this.listeners.size === 0) {
+            this.preStart();
+            this.start();
+            this.stop();
+        }
+        return this;
+    }
+
     public subscribe(listener: (state: T) => void = Store.noOp, immediate?: boolean): Subscription {
         const token = this.listenerCounter++;
         if (this.listeners.size === 0) {
