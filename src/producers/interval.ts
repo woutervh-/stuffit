@@ -3,10 +3,12 @@ import { Store } from '../store';
 export class IntervalStore extends Store<number> {
     private timer: number | undefined = undefined;
     private timeout: number;
+    private immediate: boolean;
 
-    public constructor(timeout: number) {
+    public constructor(timeout: number, immediate?: boolean) {
         super(0);
         this.timeout = timeout;
+        this.immediate = !!immediate;
     }
 
     protected preStart() {
@@ -15,6 +17,9 @@ export class IntervalStore extends Store<number> {
 
     protected start() {
         if (this.timer === undefined) {
+            if (this.immediate) {
+                this.handleInterval();
+            }
             this.timer = setInterval(this.handleInterval, this.timeout);
         }
     }
@@ -31,6 +36,6 @@ export class IntervalStore extends Store<number> {
     }
 }
 
-export const fromInterval = (timeout: number): IntervalStore => {
-    return new IntervalStore(timeout);
+export const fromInterval = (timeout: number, immediate?: boolean): IntervalStore => {
+    return new IntervalStore(timeout, immediate);
 };
