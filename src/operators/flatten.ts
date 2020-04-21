@@ -31,9 +31,9 @@ export class FlattenStore<T> extends Store<T> {
         if (this.innerDependency.hasStarted()) {
             this.innerDependency.stop();
         }
-        this.setInnerState(store.state);
         this.innerDependency = new Dependency(store, this.handleNextInner);
         this.innerDependency.start();
+        this.setInnerState(store.state);
     }
 
     private handleNextInner = (state: T) => {
